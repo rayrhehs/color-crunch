@@ -13,26 +13,26 @@ function App() {
     undefined
   );
 
-  useEffect(() => {
-    axios.get("http://127.0.0.1:5000/members").then((response) => {
-      setUserData(response.data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   axios.get("http://127.0.0.1:5000/members").then((response) => {
+  //     setUserData(response.data);
+  //   });
+  // }, []);
 
-  // test
-  const onTest = () => {
-    axios
-      .post("http://127.0.0.1:5000/test", { message: "Hello World" })
-      .then((response) => {
-        console.log(JSON.stringify(response));
-        console.log(
-          "Post request sent! This is the response: " + response.data
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  // // test
+  // const onTest = () => {
+  //   axios
+  //     .post("http://127.0.0.1:5000/test", { message: "Hello World" })
+  //     .then((response) => {
+  //       console.log(JSON.stringify(response));
+  //       console.log(
+  //         "Post request sent! This is the response: " + response.data
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
 
   const onSubmit = () => {
     if (!uploadedImage) {
@@ -42,6 +42,7 @@ function App() {
 
     const formData = new FormData();
     formData.append("image", uploadedImage);
+
     axios
       .post("http://127.0.0.1:5000/generate", formData, {
         responseType: "blob",
@@ -49,7 +50,7 @@ function App() {
       .then((response) => {
         console.log(response);
         const imageUrl = URL.createObjectURL(response.data);
-        setGeneratedImage(imageUrl); // Store the image URL in state
+        setGeneratedImage(imageUrl);
       })
       .catch((error) => {
         console.error(error);
@@ -57,20 +58,29 @@ function App() {
   };
 
   const getImage = (e: any) => {
-    console.log(e.target.files);
     setUploadedImage(e.target.files[0]);
   };
 
   return (
     <>
       {/* A .map function was used because it modifies an array and returns a new one */}
-      {userData.members.map((member, index) => (
+      {/* {userData.members.map((member, index) => (
         <div key={index}>{member}</div>
-      ))}
-      <button onClick={onTest}>TEST</button>
-      <input type="file" name="file" onChange={getImage}></input>
-      <button onClick={onSubmit}>GENERATE</button>
-      {generatedImage && <img src={generatedImage} alt="Generated" />}
+      ))} */}
+      {/* <button onClick={onTest}>TEST</button> */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        {generatedImage && <img src={generatedImage} alt="Generated" />}
+        <input type="file" name="file" onChange={getImage}></input>
+        <button onClick={onSubmit}>GENERATE</button>
+      </div>
     </>
   );
 }
