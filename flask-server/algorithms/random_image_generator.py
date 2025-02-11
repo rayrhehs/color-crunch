@@ -2,15 +2,6 @@ from PIL import Image
 import random
 from utils.helpers import open_image, save_image, create_image, get_pixel
 
-# in order to view results of the function, you must save them in a variable 
-image1 = open_image('mdh.png')
-# image1.show()
-
-# image details like it's size and format 
-print(image1.size)
-print(image1.format)
-print(image1.mode)
-
 # random generator 
 def random_generator(image):
   # get dimensions via .size 
