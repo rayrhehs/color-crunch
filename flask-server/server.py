@@ -8,16 +8,6 @@ app = Flask(__name__)
 CORS(app)  # enable CORS for all routes so I don't see an error when sending requests to backend
 
 
-@app.route("/members")
-def members():
-    return {"members": ["Member1", "Member2", "Member3"]}
-
-@app.route("/test", methods=['POST'])
-def test():
-    jsonData = request.get_json()
-    return jsonData['message']
-
-
 @app.route("/generate", methods=['POST'])
 def generate_new_image():
 

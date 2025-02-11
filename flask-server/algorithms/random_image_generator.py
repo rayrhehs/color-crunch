@@ -1,6 +1,6 @@
 from PIL import Image
 import random
-from utils.helpers import open_image, save_image, create_image, get_pixel
+from utils.helpers import create_image, get_pixel
 
 # random generator 
 def random_generator(image):
