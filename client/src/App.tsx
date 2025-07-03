@@ -16,7 +16,6 @@ function App() {
 
     const formData = new FormData();
 
-    // find out what FORMDATA DOES and why its important
     formData.append("image", uploadedImage);
 
     axios
@@ -24,8 +23,9 @@ function App() {
         responseType: "blob",
       })
       .then((response) => {
-        console.log(response);
-        const imageUrl = URL.createObjectURL(response.data);
+        console.log(response); // blob is returned
+        const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
+        // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
         setGeneratedImage(imageUrl);
       })
       .catch((error) => {
@@ -39,15 +39,7 @@ function App() {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
+      <div className="flex flex-col justify-center items-center gap-10">
         {generatedImage && <img src={generatedImage} alt="Generated" />}
         <input type="file" name="file" onChange={getImage}></input>
         <button onClick={onSubmit}>GENERATE</button>
