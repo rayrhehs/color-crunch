@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 function Sidebar() {
   const [uploadedImage, setUploadedImage] = useState();
@@ -43,6 +44,7 @@ function Sidebar() {
       {generatedImage && <img src={generatedImage} alt="Generated" />}
       <input type="file" name="file" onChange={getImage}></input>
       <button onClick={onSubmit}>GENERATE</button>
+      <Button className="text-black">Click me</Button>
     </div>
   );
 }
