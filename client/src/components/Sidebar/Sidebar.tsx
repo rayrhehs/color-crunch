@@ -43,8 +43,9 @@ function Sidebar() {
     <div className="flex flex-col justify-center items-center gap-10">
       {generatedImage && <img src={generatedImage} alt="Generated" />}
       <input type="file" name="file" onChange={getImage}></input>
-      <button onClick={onSubmit}>GENERATE</button>
-      <Button className="text-black">Click me</Button>
+      <Button variant={"mint"} size={"lg"} onClick={onSubmit}>
+        MINT
+      </Button>
     </div>
   );
 }

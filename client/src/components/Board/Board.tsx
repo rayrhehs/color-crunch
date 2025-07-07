@@ -1,3 +1,7 @@
+// need to create and add components:
+// 1. cards with images
+// 2. canvas container
+
 function Board() {
   return (
     <>
