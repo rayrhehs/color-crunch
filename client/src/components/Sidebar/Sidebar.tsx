@@ -39,11 +39,41 @@ function Sidebar() {
       });
   };
 
+  const getStats = () => {
+    if (!uploadedImage) {
+      console.error("No image selected!");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("image", uploadedImage);
+
+    axios
+      .post("http://127.0.0.1:5000/generate-modified", formData, {
+        // responseType: "blob",
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   return (
     <div className="flex flex-col justify-center items-center gap-10">
       {generatedImage && <img src={generatedImage} alt="Generated" />}
       <input type="file" name="file" onChange={getImage}></input>
       <Button variant={"mint"} size={"lg"} onClick={onSubmit}>
+        MINT
+      </Button>
+      <Button
+        variant={"mint"}
+        size={"lg"}
+        onClick={getStats}
+        className="bg-red-300"
+      >
         MINT
       </Button>
     </div>
