@@ -1,20 +1,21 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
-from algorithms.random_image_generator import random_generator
+from scripts.random_image_generator import random_generator
+from scripts.test_generator import test_generator
 from utils.helpers import open_image
+from supabase import create_client
 import io
 import os
-from supabase import create_client
 
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 supabase = create_client(url, key)
 
-app = Flask(__name__)
-CORS(app)  # enable CORS for all routes so I don't see an error when sending requests to backend 
+app = Flask(__name__)   
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # enable CORS for all routes so I don't see an error when sending requests to backend 
 
 # datatbase password: XbJMDEPlNFcdmOGB
 
@@ -35,12 +36,22 @@ def generate_new_image():
 
     # send processed image back to frontend
     return send_file(image_io, mimetype="image/png")
-    # pseudo-code/thoughts
-    # # in order to view results of the function, you must save them in a variable 
-    # image1 = open_image(request.image or whatever i need to access)
-    # image2 = random_generator(image1)
-    # return result to front-end
+
+@app.route("/generate-modified", methods=['POST'])
+def generate_modified_image():
+    uploaded_file = request.files["image"]
+    image = open_image(uploaded_file)
+    processed_image_details = test_generator(image)
+
+
+    return jsonify({"pixels": processed_image_details})
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
+
+    
