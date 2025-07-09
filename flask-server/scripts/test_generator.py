@@ -26,13 +26,9 @@ def get_image_data(image):
     return pixel_array
 
 def median_cut_quantize(image_data):
+    return
 
-    pixel_array = image_data
-
-    r_range = np.max(image_data[:, 0]) - np.min(image_data[:, 0])
-    g_range = np.max(image_data[:, 1]) - np.min(image_data[:, 1])
-    b_range = np.max(image_data[:, 2]) - np.min(image_data[:, 2])
-
+def resolve_rgb_range(image_data):
     # determine range by max - min 
     # r_range
     # g_range
@@ -41,10 +37,18 @@ def median_cut_quantize(image_data):
     # if r_range > both g and b -> order array based on r color channel
     # if g_range > both r and b -> order array based on g color channel
     # if b_range > both r and g -> order array based on b color channel
+
+    r_range = np.max(image_data[:, 0]) - np.min(image_data[:, 0])
+    g_range = np.max(image_data[:, 1]) - np.min(image_data[:, 1])
+    b_range = np.max(image_data[:, 2]) - np.min(image_data[:, 2])
+
     print("r_range = " + str(r_range))
     print("g_range = " + str(g_range))
     print("b_range = " + str(b_range))
-    return r_range
 
-def resolve_rgb_range(pixel_list):
-    return
+    if r_range > g_range and r_range > b_range:
+        return r_range
+    if g_range > r_range and g_range > b_range:
+        return g_range
+    if b_range > r_range and b_range > g_range:
+        return b_range
