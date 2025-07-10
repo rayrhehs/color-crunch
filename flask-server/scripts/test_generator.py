@@ -4,31 +4,20 @@ import random
 
 # from utils.helpers import create_image, get_pixel
 
-# def test_generator(image):
-#     pixels = list(image.getdata())
-#     print(image.size)
-#     print("Testing!")
-#     print("The length is: " + str(len(pixels))) # character length of entire pixel array
-#     print("The length of one pixel array is: " + str(len(pixels[:10])))
-#     print("These are the values from 0:10: " + str(pixels[20]))
-#     return pixels
-
 # ---------------
 # pseudo code
 # 1. get image pixel data and place it into an array -> list(image.getData()) OR use numpy array
 # 2. create function(a) -> determine the rgb value with greatest range
 # 3. order array based on this rgb value
-# 4. find median and split array at position of median into two arrays
-# 5. repeat step
+# 4. find median and split array into two
+# 5. repeat steps 2 to 4 till desired palette made
 
 def get_image_data(image): 
     pixel_array = np.array(image.getdata())
     return pixel_array
 
-def median_cut_quantize(image_data):
-    return
-
 def resolve_rgb_range(image_data):
+    
     # determine range by max - min 
     # r_range
     # g_range
@@ -47,8 +36,23 @@ def resolve_rgb_range(image_data):
     print("b_range = " + str(b_range))
 
     if r_range > g_range and r_range > b_range:
-        return r_range
+        return 0
     if g_range > r_range and g_range > b_range:
-        return g_range
+        return 1
     if b_range > r_range and b_range > g_range:
-        return b_range
+        return 2
+    
+    return 0
+
+def sort_and_split_by_color(image_data, color_channel):
+    sort_indicies = image_data[:, color_channel].argsort() # sorts and handles correct order of indicies 
+    sorted_array = image_data[sort_indicies]
+    median_index = len(sorted_array) // 2
+    left = sorted_array[:median_index]
+    right = sorted_array[median_index:]
+    return left, right
+
+def median_cut_quantize(image_data, rgb_range):
+    
+
+    return

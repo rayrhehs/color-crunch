@@ -4,7 +4,7 @@ load_dotenv()
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from scripts.random_image_generator import random_generator
-from scripts.test_generator import median_cut_quantize, get_image_data
+from scripts.test_generator import median_cut_quantize, get_image_data, resolve_rgb_range, sort_and_split_by_color
 from utils.helpers import open_image
 from supabase import create_client
 import io
@@ -42,10 +42,11 @@ def generate_modified_image():
     uploaded_file = request.files["image"]
     image = open_image(uploaded_file)
     image_data = get_image_data(image)
-    processed_image_details = median_cut_quantize(image_data)
+    rgb_range = resolve_rgb_range(image_data)
+    sorted_array = sort_and_split_by_color(image_data, rgb_range)
 
 
-    return jsonify({"pixels": processed_image_details})
+    return jsonify({"pixels": sorted_array})
 
 
 if __name__ == "__main__":
