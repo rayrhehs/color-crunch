@@ -14,10 +14,26 @@ import random
 
 def make_pixel_array(image): 
     raw_pixel_data = np.array(image.getdata())
-    pixel_array = (len(raw_pixel_data.flatten()) // 3) - 1
-    # instead of looking through pixel data, we flatten it and index to retrieve information
-    print(raw_pixel_data[pixel_array])
-    return pixel_array
+    # generates index of flattened pixel array 
+    # divided by 3 because thats how many elements per array item (rgb)
+    pixel_index_array = (len(raw_pixel_data.flatten()) // 3) - 1
+    # instead of looking through pixel data, we flatten it and index original pixel array to retrieve information
+    print(raw_pixel_data[pixel_index_array])
+    return raw_pixel_data, pixel_index_array
+
+
+# to improve efficiency(?) switch color channel to repeat the loops for each color channel
+# specify the number 3 to tell the function how many times it should repeat
+def find_min_max(pixel_arr, pixel_index, color_ch):
+  mn = mx = pixel_arr[0][0]
+
+  for i in range(pixel_index):
+    current_pixel = pixel_arr[i][color_ch]
+    if current_pixel > mx:
+      mx = current_pixel
+    elif pixel_arr[i][color_ch] < mn:
+      mn = pixel_arr[i][color_ch]
+  return mx, mn
 
 def resolve_color_channel(image_data):
     
@@ -31,10 +47,11 @@ def resolve_color_channel(image_data):
     # if b_range > both r and g -> order array based on b color channel
 
     # color_channel = 0 ADD THIS LATER TO REMOVE SO MANY RETURNS (WHY IS IT BAD PRACTICE TO HAVE THIS MANY?)
+    # [200]
 
-    r_range = np.max(image_data[:, 0]) - np.min(image_data[:, 0])
-    g_range = np.max(image_data[:, 1]) - np.min(image_data[:, 1])
-    b_range = np.max(image_data[:, 2]) - np.min(image_data[:, 2])
+    # r_range = np.max(image_data[:, 0]) - np.min(image_data[:, 0])
+    # g_range = np.max(image_data[:, 1]) - np.min(image_data[:, 1])
+    # b_range = np.max(image_data[:, 2]) - np.min(image_data[:, 2])
 
     print("r_range = " + str(r_range))
     print("g_range = " + str(g_range))
