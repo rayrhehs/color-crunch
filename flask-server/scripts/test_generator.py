@@ -22,18 +22,29 @@ def make_pixel_array(image):
     return raw_pixel_data, pixel_index_array
 
 
-# to improve efficiency(?) switch color channel to repeat the loops for each color channel
-# specify the number 3 to tell the function how many times it should repeat
 def find_min_max(pixel_arr, pixel_index, color_ch):
-  mn = mx = pixel_arr[0][0]
+  min_vals = [pixel_arr[0][0], pixel_arr[0][1], pixel_arr[0][2]]
+  max_vals = [pixel_arr[0][0], pixel_arr[0][1], pixel_arr[0][2]]
 
   for i in range(pixel_index):
-    current_pixel = pixel_arr[i][color_ch]
-    if current_pixel > mx:
-      mx = current_pixel
-    elif pixel_arr[i][color_ch] < mn:
-      mn = pixel_arr[i][color_ch]
-  return mx, mn
+    for color in range(color_ch):
+      current_pixel = pixel_arr[i][color]
+      # print(f'This is current pixels value: {current_pixel}')
+      if current_pixel > max_vals[color]:
+        max_vals[color] = current_pixel
+      elif current_pixel < min_vals[color]:
+        min_vals[color] = current_pixel
+
+  return min_vals, max_vals
+
+def rgb_range(min, max, repeat_factor):
+  ch_ranges = [0, 0, 0]
+
+  for i in range(repeat_factor):
+    ch_ranges[i] = max[i] - min[i]
+
+  return ch_ranges
+
 
 def resolve_color_channel(image_data):
     
