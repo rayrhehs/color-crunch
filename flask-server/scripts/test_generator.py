@@ -46,37 +46,21 @@ def rgb_range(min, max, repeat_factor):
   return ch_ranges
 
 
-def resolve_color_channel(image_data):
+def resolve_color_channel(ch_ranges):
     
-    # determine range by max - min 
-    # r_range
-    # g_range
-    # b_range
-
-    # if r_range > both g and b -> order array based on r color channel
-    # if g_range > both r and b -> order array based on g color channel
-    # if b_range > both r and g -> order array based on b color channel
-
-    # color_channel = 0 ADD THIS LATER TO REMOVE SO MANY RETURNS (WHY IS IT BAD PRACTICE TO HAVE THIS MANY?)
-    # [200]
-
-    # r_range = np.max(image_data[:, 0]) - np.min(image_data[:, 0])
-    # g_range = np.max(image_data[:, 1]) - np.min(image_data[:, 1])
-    # b_range = np.max(image_data[:, 2]) - np.min(image_data[:, 2])
-
-    print("r_range = " + str(r_range))
-    print("g_range = " + str(g_range))
-    print("b_range = " + str(b_range))
-
-    if r_range > g_range and r_range > b_range:
-        return 0
-    if g_range > r_range and g_range > b_range:
-        return 1
-    if b_range > r_range and b_range > g_range:
-        return 2
+  r_range = ch_ranges[0]
+  g_range = ch_ranges[1]
+  b_range = ch_ranges[2]
     
-    # if for some reason they all have the same range, choose an arbitrary one - in this case, red
-    return 0
+  if r_range > g_range and r_range > b_range:
+      return 0
+  if g_range > r_range and g_range > b_range:
+      return 1
+  if b_range > r_range and b_range > g_range:
+      return 2
+  
+  # if for some reason they all have the same range, choose an arbitrary one - in this case, red
+  return 0
 
 def sort_and_split_by_color(image_data, color_channel):
     sort_indicies = image_data[:, color_channel].argsort() # sorts and handles correct order of indicies 
