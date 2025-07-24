@@ -12,7 +12,15 @@ import random
 # 4. find median and split array into two
 # 5. repeat steps 2 to 4 till desired palette made
 
-def make_pixel_array(image): 
+def reduce_image_size(image):
+  original_width, original_height = image.size
+  shrink_width = 512
+  aspect_ratio = original_height / original_width
+  shrink_height = int(shrink_width * aspect_ratio)
+  resized_img = image.resize((shrink_width, shrink_height), Image.LANCZOS)
+  return resized_img
+
+def make_pixel_array(image):
     raw_pixel_data = np.array(image.getdata())
     # generates index of flattened pixel array 
     # divided by 3 because thats how many elements per array item (rgb)
