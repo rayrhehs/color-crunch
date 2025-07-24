@@ -91,9 +91,8 @@ def recursive_split(bucket, depth, max_depth):
   return left_buckets + right_buckets
 
 
-def median_cut (image_data, target_colors=16):
+def median_cut(image_data, target_colors=16):
   
-
   max_depth = int(np.log2(target_colors))
 
   final_buckets = recursive_split(image_data, 0, max_depth)
@@ -105,4 +104,5 @@ def median_cut (image_data, target_colors=16):
         averaged_color = calculate_avg_color(bucket)
         palette.append(averaged_color)
 
+  print(palette)
   return palette

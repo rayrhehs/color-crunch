@@ -4,7 +4,7 @@ load_dotenv()
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from scripts.random_image_generator import random_generator
-from scripts.test_generator import median_cut_quantize, make_pixel_array, resolve_color_channel, sort_and_split_by_color
+from scripts.test_generator import make_pixel_array, median_cut
 from utils.helpers import open_image
 from supabase import create_client
 import io
@@ -17,7 +17,7 @@ supabase = create_client(url, key)
 app = Flask(__name__)   
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # enable CORS for all routes so I don't see an error when sending requests to backend 
 
-# datatbase password: XbJMDEPlNFcdmOGB
+# database password: XbJMDEPlNFcdmOGB
 
 @app.route("/generate", methods=['POST'])
 def generate_new_image():
@@ -42,9 +42,9 @@ def generate_modified_image():
     uploaded_file = request.files["image"]
     image = open_image(uploaded_file)
     pixel_array = make_pixel_array(image)
+    new_palette = median_cut(pixel_array, 16)
 
-
-    return 
+    return new_palette
 
 
 if __name__ == "__main__":
