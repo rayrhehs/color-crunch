@@ -117,14 +117,14 @@ def median_cut(image_data, target_colors=16):
   return palette
 
 
-def reconstruct(image_data, palette):
+def reconstruct_data(image_data, palette):
   palette_array = np.array(palette)
 
   expanded_pixels = image_data[:, np.newaxis, :]
   expanded_palette = palette_array[np.newaxis, :, :]
 
-  print(f"Expanded pixels shape: {expanded_pixels.shape}")
-  print(f"Expanded palette shape: {expanded_palette.shape}")
+  print(f'Expanded pixels shape: {expanded_pixels.shape}')
+  print(f'Expanded palette shape: {expanded_palette.shape}')
 
   differences = expanded_pixels - expanded_palette
   squared_differences = differences ** 2
@@ -135,3 +135,15 @@ def reconstruct(image_data, palette):
   reconstructed_data = palette_array[closest_indicies]
 
   return reconstructed_data
+
+
+def reconstruct_image(image, image_data, palette):
+   
+  reconstructed_data = reconstruct_data(image_data, palette)
+
+  reconstructed_uint8 = reconstructed_data.astype(np.uint8)
+  width, height = image.size
+  reconstructed_array = reconstructed_uint8.reshape(height, width, 3)
+  reconstructed_image = Image.fromarray(reconstructed_array)
+  
+  return reconstructed_image
