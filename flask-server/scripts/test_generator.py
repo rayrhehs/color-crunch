@@ -4,14 +4,6 @@ import random
 
 # from utils.helpers import create_image, get_pixel
 
-# ---------------
-# pseudo code
-# 1. get image pixel data and place it into an array -> list(image.getData()) OR use numpy array
-# 2. create function(a) -> determine the rgb value with greatest range
-# 3. order array based on this rgb value
-# 4. find median and split array into two
-# 5. repeat steps 2 to 4 till desired palette made
-
 def reduce_image_size(image):
   original_width, original_height = image.size
   shrink_width = 512
@@ -20,8 +12,17 @@ def reduce_image_size(image):
   resized_img = image.resize((shrink_width, shrink_height), Image.LANCZOS)
   return resized_img
 
+# ---------------
+# pseudo code
+# 1. get image pixel data and place it into an array -> list(image.getData()) OR use numpy array
+# 2. create function(a) -> determine the rgb value with greatest range
+# 3. order array based on this rgb value
+# 4. find median and split array into two
+# 5. repeat steps 2 to 4 till desired palette made
+
 def make_pixel_array(image):
     raw_pixel_data = np.array(image.getdata())
+    print(f'The values are: {raw_pixel_data[:3]}')
     # generates index of flattened pixel array 
     # divided by 3 because thats how many elements per array item (rgb)
     # pixel_index_array = (len(raw_pixel_data.flatten()) // 3) - 1
@@ -90,11 +91,11 @@ def recursive_split(bucket, depth, max_depth):
   pixel_index = len(bucket)
   min_vals, max_vals = find_min_max(bucket, pixel_index, 3)
   channel_ranges = rgb_range(min_vals, max_vals, 3)
-  color_channel = resolve_color_channel(channel_ranges)
-  left, right = sort_and_split_by_color(bucket, color_channel)
+  resolved_color_channel = resolve_color_channel(channel_ranges)
+  left, right = sort_and_split_by_color(bucket, resolved_color_channel)
 
   left_buckets = recursive_split(left, depth + 1, max_depth)
-  right_buckets = recursive_split(right, depth + 1, max_depth) 
+  right_buckets = recursive_split(right, depth + 1, max_depth)
 
   return left_buckets + right_buckets
 
@@ -114,3 +115,23 @@ def median_cut(image_data, target_colors=16):
 
   print(palette)
   return palette
+
+
+def reconstruct(image_data, palette):
+  palette_array = np.array(palette)
+
+  expanded_pixels = image_data[:, np.newaxis, :]
+  expanded_palette = palette_array[np.newaxis, :, :]
+
+  print(f"Expanded pixels shape: {expanded_pixels.shape}")
+  print(f"Expanded palette shape: {expanded_palette.shape}")
+
+  differences = expanded_pixels - expanded_palette
+  squared_differences = differences ** 2
+  distances = np.sum(squared_differences, axis=2)
+
+  closest_indicies = np.argmin(distances, axis=1)
+
+  reconstructed_data = palette_array[closest_indicies]
+
+  return reconstructed_data
