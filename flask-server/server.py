@@ -6,6 +6,7 @@ from flask_cors import CORS
 from scripts.random_image_generator import random_generator
 from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, reconstruct_image
 from utils.helpers import open_image
+from utils.colors import palettes
 from supabase import create_client
 import io
 import os
@@ -43,8 +44,8 @@ def generate_modified_image():
     image = open_image(uploaded_file)
     reduced_img = reduce_image_size(image)
     pixel_array = make_pixel_array(reduced_img)
-    new_palette = median_cut(pixel_array, 8)
-    reconstructed_image = reconstruct_image(reduced_img, pixel_array, new_palette)
+    new_palette = median_cut(pixel_array, 16)
+    reconstructed_image = reconstruct_image(reduced_img, pixel_array, palettes["cyberpunk"])
     
     # Your pattern for returning the image
     image_io = io.BytesIO()

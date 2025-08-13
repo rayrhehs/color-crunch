@@ -115,11 +115,6 @@ def median_cut(image_data, target_colors=16):
   print(palette)
   return palette
 
-# determine the luminosity score of each palette color 
-# then compare with pre-generated palette colors and see which pre-gen colors have the smallest difference with image palette 
-# once determined, replace those colors with palette colors
-
-
 def reconstruct_data(image_data, palette):
   palette_array = np.array(palette)
 
