@@ -22,7 +22,6 @@ def reduce_image_size(image):
 
 def make_pixel_array(image):
     raw_pixel_data = np.array(image.getdata())
-    print(f'The values are: {raw_pixel_data[:3]}')
     # generates index of flattened pixel array 
     # divided by 3 because thats how many elements per array item (rgb)
     # pixel_index_array = (len(raw_pixel_data.flatten()) // 3) - 1
@@ -115,6 +114,10 @@ def median_cut(image_data, target_colors=16):
 
   print(palette)
   return palette
+
+# determine the luminosity score of each palette color 
+# then compare with pre-generated palette colors and see which pre-gen colors have the smallest difference with image palette 
+# once determined, replace those colors with palette colors
 
 
 def reconstruct_data(image_data, palette):

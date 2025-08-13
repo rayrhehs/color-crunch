@@ -4,7 +4,7 @@ load_dotenv()
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from scripts.random_image_generator import random_generator
-from scripts.test_generator import make_pixel_array, reduce_image_size, median_cut, reconstruct_image
+from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, reconstruct_image
 from utils.helpers import open_image
 from supabase import create_client
 import io
@@ -43,7 +43,7 @@ def generate_modified_image():
     image = open_image(uploaded_file)
     reduced_img = reduce_image_size(image)
     pixel_array = make_pixel_array(reduced_img)
-    new_palette = median_cut(pixel_array, 4)
+    new_palette = median_cut(pixel_array, 8)
     reconstructed_image = reconstruct_image(reduced_img, pixel_array, new_palette)
     
     # Your pattern for returning the image
