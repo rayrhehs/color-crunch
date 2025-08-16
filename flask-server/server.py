@@ -10,6 +10,7 @@ from utils.colors import palettes
 from supabase import create_client
 import io
 import os
+import uuid
 
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
@@ -17,8 +18,6 @@ supabase = create_client(url, key)
 
 app = Flask(__name__)   
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # enable CORS for all routes so I don't see an error when sending requests to backend 
-
-# database password: XbJMDEPlNFcdmOGB
 
 @app.route("/generate", methods=['POST'])
 def generate_new_image():
@@ -42,17 +41,38 @@ def generate_new_image():
 def generate_modified_image():
     uploaded_file = request.files["image"]
     image = open_image(uploaded_file)
+
+    # below functions can be put into a barrel function of some sort 
     reduced_img = reduce_image_size(image)
     pixel_array = make_pixel_array(reduced_img)
     new_palette = median_cut(pixel_array, 16)
-    reconstructed_image = reconstruct_image(reduced_img, pixel_array, palettes["cyberpunk"])
+    reconstructed_image = reconstruct_image(reduced_img, pixel_array, palettes["blue"])
     
-    # Your pattern for returning the image
+    # sending image to db and user
     image_io = io.BytesIO()
-    reconstructed_image.save(image_io, format="PNG")
+    reconstructed_image.save(image_io, format="JPEG")
     image_io.seek(0)
+
+    image_bytes = image_io.getvalue()
+
+    filename = f"modified_image_{uuid.uuid4()}.jpeg"
+
+    response = supabase.storage.from_("image-bucket").upload(
+        file=image_bytes,
+        path=filename,
+        file_options={"content-type": "image/jpeg"}
+    )
     
-    return send_file(image_io, mimetype="image/png")
+    image_io.seek(0)
+
+    if (response.status_code == 200):
+        return_io = io.BytesIO(image_bytes)
+        return send_file(return_io, mimetype="image/jpeg")
+    else:
+        return jsonify({
+                "success": False,
+                "error": "Failed to upload image"
+            }), 500
 
 
 

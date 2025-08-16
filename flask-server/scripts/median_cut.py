@@ -1,8 +1,13 @@
 from PIL import Image
 import numpy as np
-import random
 
-# from utils.helpers import create_image, get_pixel
+# ---------------
+# pseudo code
+# 1. get image pixel data and place it into an array -> list(image.getData()) OR use numpy array
+# 2. create function(a) -> determine the rgb value with greatest range
+# 3. order array based on this rgb value
+# 4. find median and split array into two
+# 5. repeat steps 2 to 4 till desired palette made
 
 def reduce_image_size(image):
   original_width, original_height = image.size
@@ -12,13 +17,6 @@ def reduce_image_size(image):
   resized_img = image.resize((shrink_width, shrink_height), Image.LANCZOS)
   return resized_img
 
-# ---------------
-# pseudo code
-# 1. get image pixel data and place it into an array -> list(image.getData()) OR use numpy array
-# 2. create function(a) -> determine the rgb value with greatest range
-# 3. order array based on this rgb value
-# 4. find median and split array into two
-# 5. repeat steps 2 to 4 till desired palette made
 
 def make_pixel_array(image):
     raw_pixel_data = np.array(image.getdata())
@@ -44,6 +42,7 @@ def find_min_max(pixel_arr, pixel_index, ch_num):
         min_vals[color] = current_pixel
 
   return min_vals, max_vals
+
 
 def rgb_range(min, max, repeat_factor):
   ch_ranges = [0, 0, 0]
@@ -71,6 +70,7 @@ def resolve_color_channel(ch_ranges):
   # if for some reason they all have the same range, choose an arbitrary one - in this case, red
   return 0
 
+
 def sort_and_split_by_color(image_data, color_channel):
     sort_indicies = image_data[:, color_channel].argsort() # sorts and handles correct order of indicies 
     sorted_array = image_data[sort_indicies]
@@ -79,8 +79,10 @@ def sort_and_split_by_color(image_data, color_channel):
     right = sorted_array[median_index:]
     return left, right
 
+
 def calculate_avg_color(bucket):
    return np.mean(bucket, axis=0)
+
 
 def recursive_split(bucket, depth, max_depth):
   # base case
@@ -112,8 +114,8 @@ def median_cut(image_data, target_colors=16):
         averaged_color = calculate_avg_color(bucket)
         palette.append(averaged_color)
 
-  print(palette)
   return palette
+
 
 def reconstruct_data(image_data, palette):
   palette_array = np.array(palette)
@@ -121,8 +123,8 @@ def reconstruct_data(image_data, palette):
   expanded_pixels = image_data[:, np.newaxis, :]
   expanded_palette = palette_array[np.newaxis, :, :]
 
-  print(f'Expanded pixels shape: {expanded_pixels.shape}')
-  print(f'Expanded palette shape: {expanded_palette.shape}')
+  # print(f'Expanded pixels shape: {expanded_pixels.shape}')
+  # print(f'Expanded palette shape: {expanded_palette.shape}')
 
   differences = expanded_pixels - expanded_palette
   squared_differences = differences ** 2
