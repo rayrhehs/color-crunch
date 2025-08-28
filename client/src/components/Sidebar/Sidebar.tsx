@@ -1,12 +1,64 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function Sidebar() {
   const [uploadedImage, setUploadedImage] = useState();
   const [generatedImage, setGeneratedImage] = useState<string | undefined>(
     undefined
   );
+  const [paletteSize, setPaletteSize] = useState([8]);
+  const [currentTheme, setCurrentTheme] = useState(0);
+
+  const themes = [
+    {
+      colors: [
+        "#f8f9fa",
+        "#e9ecef",
+        "#dee2e6",
+        "#ced4da",
+        "#adb5bd",
+        "#6c757d",
+        "#495057",
+        "#343a40",
+      ],
+    },
+    {
+      colors: [
+        "#fdf2f8",
+        "#fce7f3",
+        "#fbcfe8",
+        "#f9a8d4",
+        "#f472b6",
+        "#ec4899",
+        "#db2777",
+        "#be185d",
+      ],
+    },
+    {
+      colors: [
+        "#fef3c7",
+        "#fde68a",
+        "#fcd34d",
+        "#f59e0b",
+        "#d97706",
+        "#b45309",
+        "#92400e",
+        "#78350f",
+      ],
+    },
+  ];
+
+  const nextTheme = () => {
+    setCurrentTheme((prev) => (prev + 1) % themes.length);
+  };
+
+  const prevTheme = () => {
+    setCurrentTheme((prev) => (prev - 1 + themes.length) % themes.length);
+  };
 
   // get image from user
   const getImage = (e: any) => {
@@ -51,10 +103,13 @@ function Sidebar() {
 
     axios
       .post("http://127.0.0.1:5000/generate-modified", formData, {
-        // responseType: "blob",
+        responseType: "blob",
       })
       .then((response) => {
         console.log(response);
+        const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
+        // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
+        setGeneratedImage(imageUrl);
       })
       .catch((error) => {
         console.error(error);
@@ -62,21 +117,120 @@ function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center gap-10">
-      {generatedImage && <img src={generatedImage} alt="Generated" />}
-      <input type="file" name="file" onChange={getImage}></input>
-      <Button variant={"mint"} size={"lg"} onClick={onSubmit}>
-        MINT
+    // <div className="flex flex-col justify-center items-center gap-10">
+    //   {generatedImage && <img src={generatedImage} alt="Generated" />}
+    //   <div className="bg-black w-lg h-32 flex justify-center">
+    //     <input type="file" name="file" onChange={getImage} id="upload" hidden />
+    //     <label htmlFor="upload" className="border-4 p-8 text-white h-fit">
+    //       UPLOAD IMAGE
+    //     </label>
+    //   </div>
+    //   <Button variant={"mint"} size={"lg"} onClick={onSubmit}>
+    //     MINT
+    //   </Button>
+    //   <Button
+    //     variant={"mint"}
+    //     size={"lg"}
+    //     onClick={getStats}
+    //     className="bg-red-300"
+    //   >
+    //     MINT
+    //   </Button>
+    // </div>
+    <>
+      {/* Control Panel */}
+      {/* INFO Section */}
+      <div className="bg-black text-white">
+        <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
+          INFO
+        </div>
+        <div className="bg-white border-4 border-black text-black p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
+          <div>sourcefile.png</div>
+          <div>250 kb</div>
+          <div>2985736235 pixels</div>
+        </div>
+      </div>
+
+      {/* THEMES Section */}
+      <div className="bg-black text-white">
+        <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
+          THEMES
+        </div>
+        <div className="bg-white p-3 md:p-4 space-y-3 border-4 border-black">
+          {/* Theme strips */}
+          <div className="space-y-2">
+            {themes.map((theme, index) => (
+              <div
+                key={index}
+                className="flex h-6 sm:h-8 border-2 border-black"
+              >
+                {theme.colors.map((color, colorIndex) => (
+                  <div
+                    key={colorIndex}
+                    className="flex-1"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation arrows */}
+          <div className="flex gap-2">
+            <Button
+              onClick={prevTheme}
+              className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8"
+              size="sm"
+            >
+              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              onClick={nextTheme}
+              className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8"
+              size="sm"
+            >
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* PALETTE SIZE Section */}
+      <div className="bg-black text-white">
+        <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
+          PALETTE SIZE
+        </div>
+        <div className="bg-white p-3 md:p-4 border-4 border-black">
+          <div className="space-y-3 md:space-y-4">
+            {/* Size labels */}
+            <div className="flex justify-between text-black font-mono text-xs sm:text-sm">
+              <span>2</span>
+              <span>4</span>
+              <span>8</span>
+              <span>12</span>
+              <span>16</span>
+            </div>
+
+            {/* Slider */}
+            <div className="px-2">
+              <Slider
+                value={paletteSize}
+                onValueChange={setPaletteSize}
+                max={20}
+                min={0}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* GENERATE Button */}
+      <Button className="w-full rounded-none bg-black text-white hover:bg-gray-800 h-12 sm:h-16 text-lg sm:text-xl font-bold">
+        GENERATE
       </Button>
-      <Button
-        variant={"mint"}
-        size={"lg"}
-        onClick={getStats}
-        className="bg-red-300"
-      >
-        MINT
-      </Button>
-    </div>
+    </>
   );
 }
 
