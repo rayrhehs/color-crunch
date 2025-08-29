@@ -18,12 +18,12 @@ function App() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   return (
-    <>
+    <div className="w-screen">
       <SelectedImageContext.Provider
         value={{ selectedImage, setSelectedImage }}
       >
         {selectedImage ? (
-          <div className="w-full md:w-80 flex-shrink-0 space-y-2 sm:space-y-4 overflow-y-auto max-h-[60vh] md:max-h-[80vh]">
+          <div className="min-h-screen max-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4">
             <Board></Board>
             <Sidebar></Sidebar>
           </div>
@@ -31,7 +31,7 @@ function App() {
           <HomePage></HomePage>
         )}
       </SelectedImageContext.Provider>
-    </>
+    </div>
   );
 }
 
