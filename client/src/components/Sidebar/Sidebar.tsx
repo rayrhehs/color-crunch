@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import palettes from "./palettes.json";
 
 function Sidebar() {
   const [uploadedImage, setUploadedImage] = useState();
@@ -13,51 +14,12 @@ function Sidebar() {
   const [paletteSize, setPaletteSize] = useState([8]);
   const [currentTheme, setCurrentTheme] = useState(0);
 
-  const themes = [
-    {
-      colors: [
-        "#f8f9fa",
-        "#e9ecef",
-        "#dee2e6",
-        "#ced4da",
-        "#adb5bd",
-        "#6c757d",
-        "#495057",
-        "#343a40",
-      ],
-    },
-    {
-      colors: [
-        "#fdf2f8",
-        "#fce7f3",
-        "#fbcfe8",
-        "#f9a8d4",
-        "#f472b6",
-        "#ec4899",
-        "#db2777",
-        "#be185d",
-      ],
-    },
-    {
-      colors: [
-        "#fef3c7",
-        "#fde68a",
-        "#fcd34d",
-        "#f59e0b",
-        "#d97706",
-        "#b45309",
-        "#92400e",
-        "#78350f",
-      ],
-    },
-  ];
-
   const nextTheme = () => {
-    setCurrentTheme((prev) => (prev + 1) % themes.length);
+    setCurrentTheme((prev) => (prev + 1) % palettes.length);
   };
 
   const prevTheme = () => {
-    setCurrentTheme((prev) => (prev - 1 + themes.length) % themes.length);
+    setCurrentTheme((prev) => (prev - 1 + palettes.length) % palettes.length);
   };
 
   // get image from user
@@ -160,16 +122,16 @@ function Sidebar() {
           <div className="bg-white p-3 md:p-4 space-y-3 border-4 border-black">
             {/* Theme strips */}
             <div className="space-y-2">
-              {themes.map((theme, index) => (
+              {Object.entries(palettes).map(([name, colors]) => (
                 <div
-                  key={index}
+                  key={name}
                   className="flex h-6 sm:h-8 border-2 border-black"
                 >
-                  {theme.colors.map((color, colorIndex) => (
+                  {colors.map((color, colorIndex) => (
                     <div
                       key={colorIndex}
                       className="flex-1"
-                      style={{ backgroundColor: color }}
+                      style={{ backgroundColor: `rgb(${color})` }}
                     />
                   ))}
                 </div>
