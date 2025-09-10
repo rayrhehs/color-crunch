@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import palettes from "./palettes.json";
+import { start } from "repl";
 
 function Sidebar() {
   const [uploadedImage, setUploadedImage] = useState();
@@ -12,15 +13,36 @@ function Sidebar() {
     undefined
   );
   const [paletteSize, setPaletteSize] = useState([8]);
-  const [currentTheme, setCurrentTheme] = useState(0);
+  const [theme, setTheme] = useState(0); // use this for selecting the current theme during button creation
 
-  const nextTheme = () => {
-    setCurrentTheme((prev) => (prev + 1) % palettes.length);
+  // pseudocode for page selection
+  // currentVal = 3
+  // query the next three values from an array or map
+  // currentVal: currentVal + 3
+  // consider setting this to currentVal + 2 on mobile devices
+  // +3 to the value each time and just query till the array is finished
+  // back button subtracts from currentVal
+
+  // const [pageIndex, setPageIndex] = useState<number[]>([0, 3]);
+  const [startIndex, setStartIndex] = useState<number>(0);
+  const paletteColors = Object.values(palettes);
+  const ITEMS_PER_PAGE = 3;
+
+  const handleNextTheme = () => {
+    setStartIndex((prev) =>
+      Math.min(prev + ITEMS_PER_PAGE, paletteColors.length - ITEMS_PER_PAGE)
+    );
+    console.log(paletteColors);
   };
 
-  const prevTheme = () => {
-    setCurrentTheme((prev) => (prev - 1 + palettes.length) % palettes.length);
+  const handlePrevTheme = () => {
+    setStartIndex((prev) => Math.max(prev - ITEMS_PER_PAGE, 0));
   };
+
+  const visiblePalettes = paletteColors.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
 
   // get image from user
   const getImage = (e: any) => {
@@ -100,7 +122,6 @@ function Sidebar() {
     //   </Button>
     // </div>
     <>
-      {/* Control Panel */}
       {/* INFO Section */}
       <div className="w-full md:w-80 flex-shrink-0 space-y-2 sm:space-y-4 overflow-y-auto max-h-[60vh] md:max-h-[80vh]">
         <div className="bg-black text-white">
@@ -122,16 +143,16 @@ function Sidebar() {
           <div className="bg-white p-3 md:p-4 space-y-3 border-4 border-black">
             {/* Theme strips */}
             <div className="space-y-2">
-              {Object.entries(palettes).map(([name, colors]) => (
+              {visiblePalettes.map((palette, paletteIndex) => (
                 <div
-                  key={name}
+                  key={paletteIndex}
                   className="flex h-6 sm:h-8 border-2 border-black"
                 >
-                  {colors.map((color, colorIndex) => (
+                  {palette.map((color, colorIndex) => (
                     <div
                       key={colorIndex}
                       className="flex-1"
-                      style={{ backgroundColor: `rgb(${color})` }}
+                      style={{ backgroundColor: `rgb(${color.join(", ")})` }}
                     />
                   ))}
                 </div>
@@ -141,14 +162,14 @@ function Sidebar() {
             {/* Navigation arrows */}
             <div className="flex gap-2">
               <Button
-                onClick={prevTheme}
+                onClick={handlePrevTheme}
                 className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8"
                 size="sm"
               >
                 <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               <Button
-                onClick={nextTheme}
+                onClick={handleNextTheme}
                 className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8"
                 size="sm"
               >
