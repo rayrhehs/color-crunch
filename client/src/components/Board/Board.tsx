@@ -5,9 +5,6 @@ import { SelectedImageContext } from "@/App";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function Board() {
-  const [paletteSize, setPaletteSize] = useState([8]);
-  const [currentTheme, setCurrentTheme] = useState(0);
-
   const imageContext = useContext(SelectedImageContext);
 
   // check to see if null -> by doing this, typescript will not complain!

@@ -5,7 +5,6 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import palettes from "./palettes.json";
-import { start } from "repl";
 
 function Sidebar() {
   const [uploadedImage, setUploadedImage] = useState();
@@ -13,41 +12,36 @@ function Sidebar() {
     undefined
   );
   const [paletteSize, setPaletteSize] = useState([8]);
-  const [theme, setTheme] = useState(0); // use this for selecting the current theme during button creation
+  const [theme, setTheme] = useState<string>("blue"); // use this for selecting the current theme during button creation
 
-  // pseudocode for page selection
-  // currentVal = 3
-  // query the next three values from an array or map
-  // currentVal: currentVal + 3
-  // consider setting this to currentVal + 2 on mobile devices
-  // +3 to the value each time and just query till the array is finished
-  // back button subtracts from currentVal
-
-  // const [pageIndex, setPageIndex] = useState<number[]>([0, 3]);
   const [startIndex, setStartIndex] = useState<number>(0);
-  const paletteColors = Object.values(palettes);
+  const paletteEntries = Object.entries(palettes);
   const ITEMS_PER_PAGE = 3;
 
   const handleNextTheme = () => {
     setStartIndex((prev) =>
-      Math.min(prev + ITEMS_PER_PAGE, paletteColors.length - ITEMS_PER_PAGE)
+      Math.min(prev + ITEMS_PER_PAGE, paletteEntries.length - ITEMS_PER_PAGE)
     );
-    console.log(paletteColors);
+    console.log(paletteEntries);
   };
 
   const handlePrevTheme = () => {
     setStartIndex((prev) => Math.max(prev - ITEMS_PER_PAGE, 0));
   };
 
-  const visiblePalettes = paletteColors.slice(
+  // onClick -> change selected theme
+  const changeSelectedTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const theme = e.currentTarget.dataset.theme;
+    if (theme) {
+      setTheme(theme);
+      console.log(theme);
+    }
+  };
+
+  const visiblePalettes = paletteEntries.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE
   );
-
-  // get image from user
-  const getImage = (e: any) => {
-    setUploadedImage(e.target.files[0]);
-  };
 
   // submit image to back-end and retrieve response
   const onSubmit = () => {
@@ -141,21 +135,22 @@ function Sidebar() {
             THEMES
           </div>
           <div className="bg-white p-3 md:p-4 space-y-3 border-4 border-black">
-            {/* Theme strips */}
-            <div className="space-y-2">
-              {visiblePalettes.map((palette, paletteIndex) => (
-                <div
-                  key={paletteIndex}
-                  className="flex h-6 sm:h-8 border-2 border-black"
+            <div className="space-y-2 cursor-pointer">
+              {visiblePalettes.map(([name, colors]) => (
+                <button
+                  data-theme={name}
+                  key={name}
+                  className="flex h-6 sm:h-8 w-full transition-all duration-200 hover:scale-[1.02] border-2 border-black cursor-pointer"
+                  onClick={changeSelectedTheme}
                 >
-                  {palette.map((color, colorIndex) => (
+                  {colors.map((color, colorIndex) => (
                     <div
                       key={colorIndex}
                       className="flex-1"
                       style={{ backgroundColor: `rgb(${color.join(", ")})` }}
                     />
                   ))}
-                </div>
+                </button>
               ))}
             </div>
 
@@ -163,14 +158,14 @@ function Sidebar() {
             <div className="flex gap-2">
               <Button
                 onClick={handlePrevTheme}
-                className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8"
+                className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8 cursor-pointer"
                 size="sm"
               >
                 <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               <Button
                 onClick={handleNextTheme}
-                className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8"
+                className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8 cursor-pointer"
                 size="sm"
               >
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
