@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,11 @@ function Sidebar() {
   const [generatedImage, setGeneratedImage] = useState<string | undefined>(
     undefined
   );
-  const [paletteSize, setPaletteSize] = useState([8]);
+
+  const paletteValues = [2, 4, 8, 12, 16];
+  const [paletteIndex, setPaletteIndex] = useState(2);
+  const currentPaletteSize = paletteValues[paletteIndex];
+
   const [theme, setTheme] = useState<string>("blue"); // use this for selecting the current theme during button creation
 
   const [startIndex, setStartIndex] = useState<number>(0);
@@ -92,6 +96,11 @@ function Sidebar() {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+  const paletteSizeDefiner = () => {
+    console.log(paletteIndex);
+    console.log(currentPaletteSize);
   };
 
   return (
@@ -193,11 +202,11 @@ function Sidebar() {
               {/* Slider */}
               <div className="px-2">
                 <Slider
-                  value={paletteSize}
-                  onValueChange={setPaletteSize}
-                  max={20}
+                  value={[paletteIndex]}
+                  onValueChange={(index) => setPaletteIndex(index[0])}
+                  max={4}
                   min={0}
-                  step={5}
+                  step={1}
                   className="w-full"
                 />
               </div>
@@ -206,7 +215,10 @@ function Sidebar() {
         </div>
 
         {/* GENERATE Button */}
-        <Button className="w-full rounded-none bg-black text-white hover:bg-gray-800 h-12 sm:h-16 text-lg sm:text-xl font-bold">
+        <Button
+          className="w-full rounded-none bg-black text-white hover:bg-gray-800 h-12 sm:h-16 text-lg sm:text-xl font-bold"
+          onClick={paletteSizeDefiner}
+        >
           GENERATE
         </Button>
       </div>
