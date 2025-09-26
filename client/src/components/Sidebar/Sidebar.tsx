@@ -13,7 +13,7 @@ function Sidebar() {
   );
 
   const paletteValues = [2, 4, 8, 12, 16];
-  const [paletteIndex, setPaletteIndex] = useState(2);
+  const [paletteIndex, setPaletteIndex] = useState<number>(2); // note: 2 is not the palette size, it is index pointing to palette size = 8
   const currentPaletteSize = paletteValues[paletteIndex];
 
   const [theme, setTheme] = useState<string>("blue"); // use this for selecting the current theme during button creation
@@ -188,21 +188,21 @@ function Sidebar() {
           <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
             PALETTE SIZE
           </div>
-          <div className="bg-white p-3 md:p-4 border-4 border-black">
+          <div className="bg-white p-2 md:p-4 border-4 border-black">
             <div className="space-y-3 md:space-y-4">
               {/* Size labels */}
-              <div className="flex justify-between text-black font-mono text-xs sm:text-sm">
+              <div className="flex px-1 justify-between text-black font-mono text-xs sm:text-sm">
                 <span>2</span>
-                <span>4</span>
-                <span>8</span>
-                <span>12</span>
+                <span className="pl-2.5">4</span>
+                <span className="pl-3">8</span>
+                <span className="pl-2">12</span>
                 <span>16</span>
               </div>
 
               {/* Slider */}
-              <div className="px-2">
+              <div>
                 <Slider
-                  value={[paletteIndex]}
+                  value={[paletteIndex]} // this has to be turned into an array because that is the way sliders work
                   onValueChange={(index) => setPaletteIndex(index[0])}
                   max={4}
                   min={0}
