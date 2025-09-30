@@ -4,7 +4,7 @@ load_dotenv()
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from scripts.random_image_generator import random_generator
-from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, reconstruct_image
+from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, median_swap, reconstruct_image
 from utils.helpers import open_image
 from utils.colors import palettes
 from supabase import create_client
@@ -42,11 +42,14 @@ def generate_modified_image():
     uploaded_file = request.files["image"]
     image = open_image(uploaded_file)
 
-    # below functions can be put into a barrel function of some sort 
+    user_theme = request.form["theme"]
+    user_palette_size = request.form["paletteSize"]
+
     reduced_img = reduce_image_size(image)
     pixel_array = make_pixel_array(reduced_img)
-    new_palette = median_cut(pixel_array, 16)
-    reconstructed_image = reconstruct_image(reduced_img, pixel_array, palettes["blue"])
+    new_palette = median_cut(pixel_array, int(user_palette_size))
+    swapped_palette = median_swap(new_palette, palettes[user_theme])
+    reconstructed_image = reconstruct_image(reduced_img, pixel_array, swapped_palette)
     
     # sending image to db and user
     image_io = io.BytesIO()
@@ -57,11 +60,11 @@ def generate_modified_image():
 
     filename = f"modified_image_{uuid.uuid4()}.jpeg"
 
-    response = supabase.storage.from_("image-bucket").upload(
-        file=image_bytes,
-        path=filename,
-        file_options={"content-type": "image/jpeg"}
-    )
+    # response = supabase.storage.from_("image-bucket").upload(
+    #     file=image_bytes,
+    #     path=filename,
+    #     file_options={"content-type": "image/jpeg"}
+    # )
     
     image_io.seek(0)
 
@@ -73,7 +76,6 @@ def generate_modified_image():
                 "success": False,
                 "error": "Failed to upload image"
             }), 500
-
 
 
 if __name__ == "__main__":

@@ -107,14 +107,28 @@ def median_cut(image_data, target_colors=16):
 
   final_buckets = recursive_split(image_data, 0, max_depth)
 
-  palette = []
+  new_palette = []
 
   for bucket in final_buckets:
      if len(bucket) > 0:
         averaged_color = calculate_avg_color(bucket)
-        palette.append(averaged_color)
+        new_palette.append(averaged_color)
 
-  return palette
+  return new_palette
+
+
+def median_swap(palette, user_palette):
+   reduced_palette = np.array(palette)
+   target_palette = np.array(user_palette)
+   
+   swapped_palette = []
+   for color in reduced_palette:
+      diffs = target_palette - color
+      dists = np.sum(diffs**2, axis=1)
+      idx = np.argmin(dists)
+      swapped_palette.append(target_palette[idx])
+
+   return swapped_palette
 
 
 def reconstruct_data(image_data, palette):
