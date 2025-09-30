@@ -10,26 +10,39 @@ type ImageContextType = {
   setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
 };
 
+type GeneratedImageContextType = {
+  generatedImage: File | null;
+  setGeneratedImage: React.Dispatch<React.SetStateAction<File | null>>;
+};
+
 export const SelectedImageContext = createContext<ImageContextType | null>(
   null
 );
 
+export const GeneratedImageContext =
+  createContext<GeneratedImageContextType | null>(null);
+
 function App() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<File | null>(null);
 
   return (
     <div className="w-screen">
       <SelectedImageContext.Provider
         value={{ selectedImage, setSelectedImage }}
       >
-        {selectedImage ? (
-          <div className="min-h-screen max-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4">
-            <Board></Board>
-            <Sidebar></Sidebar>
-          </div>
-        ) : (
-          <HomePage></HomePage>
-        )}
+        <GeneratedImageContext.Provider
+          value={{ generatedImage, setGeneratedImage }}
+        >
+          {selectedImage ? (
+            <div className="min-h-screen max-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4">
+              <Board></Board>
+              <Sidebar></Sidebar>
+            </div>
+          ) : (
+            <HomePage></HomePage>
+          )}
+        </GeneratedImageContext.Provider>
       </SelectedImageContext.Provider>
     </div>
   );

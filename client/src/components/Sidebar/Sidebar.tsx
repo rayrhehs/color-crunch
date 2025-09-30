@@ -1,21 +1,38 @@
 import axios from "axios";
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import palettes from "./palettes.json";
+import { SelectedImageContext, GeneratedImageContext } from "@/App";
 
 function Sidebar() {
+  const imageContext = useContext(SelectedImageContext);
+  const generatedImageContext = useContext(GeneratedImageContext);
+
+  if (!imageContext) {
+    throw new Error("ImageContext must be used within a ImageContext.Provider");
+  }
+
+  if (!generatedImageContext) {
+    throw new Error(
+      "GeneratedImageContext must be used within a GeneratedImageContext.Provider"
+    );
+  }
+
+  const { selectedImage } = imageContext;
+  const { setGeneratedImage } = generatedImageContext;
+
   const [uploadedImage, setUploadedImage] = useState();
-  const [generatedImage, setGeneratedImage] = useState<string | undefined>(
-    undefined
-  );
 
   const paletteValues = [2, 4, 8, 12, 16];
   const [paletteIndex, setPaletteIndex] = useState<number>(2); // note: 2 is not the palette size, it is index pointing to palette size = 8
+
+  // needs to be added to form data
   const currentPaletteSize = paletteValues[paletteIndex];
 
+  // needs to be added to formData
   const [theme, setTheme] = useState<string>("blue"); // use this for selecting the current theme during button creation
 
   const [startIndex, setStartIndex] = useState<number>(0);
@@ -47,41 +64,43 @@ function Sidebar() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  // submit image to back-end and retrieve response
-  const onSubmit = () => {
-    if (!uploadedImage) {
-      console.error("No image selected!");
-      return;
-    }
+  // // submit image to back-end and retrieve response
+  // const onSubmit = () => {
+  //   if (!uploadedImage) {
+  //     console.error("No image selected!");
+  //     return;
+  //   }
 
-    const formData = new FormData();
+  //   const formData = new FormData();
 
-    formData.append("image", uploadedImage);
+  //   formData.append("image", uploadedImage);
 
-    axios
-      .post("http://127.0.0.1:5000/generate", formData, {
-        responseType: "blob",
-      })
-      .then((response) => {
-        console.log(response); // blob is returned
-        const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
-        // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
-        setGeneratedImage(imageUrl);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  //   axios
+  //     .post("http://127.0.0.1:5000/generate", formData, {
+  //       responseType: "blob",
+  //     })
+  //     .then((response) => {
+  //       console.log(response); // blob is returned
+  //       const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
+  //       // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
+  //       setGeneratedImage(imageUrl);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
 
   const getStats = () => {
-    if (!uploadedImage) {
+    if (!selectedImage) {
       console.error("No image selected!");
       return;
     }
 
     const formData = new FormData();
 
-    formData.append("image", uploadedImage);
+    formData.append("image", selectedImage);
+    formData.append("theme", theme);
+    formData.append("paletteSize", currentPaletteSize.toString());
 
     axios
       .post("http://127.0.0.1:5000/generate-modified", formData, {
@@ -91,17 +110,17 @@ function Sidebar() {
         console.log(response);
         const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
         // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
-        setGeneratedImage(imageUrl);
+        setGeneratedImage(response.data);
       })
       .catch((error) => {
         console.error(error);
       });
   };
 
-  const paletteSizeDefiner = () => {
-    console.log(paletteIndex);
-    console.log(currentPaletteSize);
-  };
+  // const paletteSizeDefiner = () => {
+  //   console.log(paletteIndex);
+  //   console.log(currentPaletteSize);
+  // };
 
   return (
     // <div className="flex flex-col justify-center items-center gap-10">
@@ -217,7 +236,7 @@ function Sidebar() {
         {/* GENERATE Button */}
         <Button
           className="w-full rounded-none bg-black text-white hover:bg-gray-800 h-12 sm:h-16 text-lg sm:text-xl font-bold"
-          onClick={paletteSizeDefiner}
+          onClick={getStats}
         >
           GENERATE
         </Button>
