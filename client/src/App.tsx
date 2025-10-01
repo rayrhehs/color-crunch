@@ -2,17 +2,17 @@ import { useState, createContext } from "react";
 // import axios from "axios";
 import Board from "./components/Board/Board";
 import Sidebar from "./components/Sidebar/Sidebar";
-import HomePage from "./components/Homepage/HomePage";
+import HomePage from "./components/HomePage/HomePage";
 import "./App.css";
 
 type ImageContextType = {
-  selectedImage: File | null;
-  setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
+  selectedImage: Blob | null;
+  setSelectedImage: React.Dispatch<React.SetStateAction<Blob | null>>;
 };
 
 type GeneratedImageContextType = {
-  generatedImage: File | null;
-  setGeneratedImage: React.Dispatch<React.SetStateAction<File | null>>;
+  generatedImage: Blob | null;
+  setGeneratedImage: React.Dispatch<React.SetStateAction<Blob | null>>;
 };
 
 export const SelectedImageContext = createContext<ImageContextType | null>(
@@ -23,8 +23,8 @@ export const GeneratedImageContext =
   createContext<GeneratedImageContextType | null>(null);
 
 function App() {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<File | null>(null);
+  const [selectedImage, setSelectedImage] = useState<Blob | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<Blob | null>(null);
 
   return (
     <div className="w-screen">

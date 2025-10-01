@@ -1,8 +1,7 @@
 import axios from "axios";
-import { useState, useRef, useContext } from "react";
+import { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import palettes from "./palettes.json";
 import { SelectedImageContext, GeneratedImageContext } from "@/App";
@@ -24,16 +23,12 @@ function Sidebar() {
   const { selectedImage } = imageContext;
   const { setGeneratedImage } = generatedImageContext;
 
-  const [uploadedImage, setUploadedImage] = useState();
-
   const paletteValues = [2, 4, 8, 12, 16];
   const [paletteIndex, setPaletteIndex] = useState<number>(2); // note: 2 is not the palette size, it is index pointing to palette size = 8
 
-  // needs to be added to form data
   const currentPaletteSize = paletteValues[paletteIndex];
 
-  // needs to be added to formData
-  const [theme, setTheme] = useState<string>("blue"); // use this for selecting the current theme during button creation
+  const [theme, setTheme] = useState<string>("red"); // use this for selecting the current theme during button creation
 
   const [startIndex, setStartIndex] = useState<number>(0);
   const paletteEntries = Object.entries(palettes);
@@ -64,31 +59,15 @@ function Sidebar() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  // // submit image to back-end and retrieve response
-  // const onSubmit = () => {
-  //   if (!uploadedImage) {
-  //     console.error("No image selected!");
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-
-  //   formData.append("image", uploadedImage);
-
-  //   axios
-  //     .post("http://127.0.0.1:5000/generate", formData, {
-  //       responseType: "blob",
-  //     })
-  //     .then((response) => {
-  //       console.log(response); // blob is returned
-  //       const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
-  //       // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
-  //       setGeneratedImage(imageUrl);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
+  function base64ToBlob(base64: string, mime: string): Blob {
+    const byteChars = atob(base64);
+    const byteNumbers = new Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) {
+      byteNumbers[i] = byteChars.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mime });
+  }
 
   const getStats = () => {
     if (!selectedImage) {
@@ -104,13 +83,10 @@ function Sidebar() {
 
     axios
       .post("http://127.0.0.1:5000/generate-modified", formData, {
-        responseType: "blob",
+        responseType: "json",
       })
       .then((response) => {
-        console.log(response);
-        const imageUrl = URL.createObjectURL(response.data); // turns blob into a URL that img tag can use (img can only use URLs for source)
-        // window.open(imageUrl, "_blank"); // open image in new url OR inspect element the outputted image to see the URL
-        setGeneratedImage(response.data);
+        setGeneratedImage(base64ToBlob(response.data.data, response.data.mime));
       })
       .catch((error) => {
         console.error(error);
@@ -123,26 +99,6 @@ function Sidebar() {
   // };
 
   return (
-    // <div className="flex flex-col justify-center items-center gap-10">
-    //   {generatedImage && <img src={generatedImage} alt="Generated" />}
-    //   <div className="bg-black w-lg h-32 flex justify-center">
-    //     <input type="file" name="file" onChange={getImage} id="upload" hidden />
-    //     <label htmlFor="upload" className="border-4 p-8 text-white h-fit">
-    //       UPLOAD IMAGE
-    //     </label>
-    //   </div>
-    //   <Button variant={"mint"} size={"lg"} onClick={onSubmit}>
-    //     MINT
-    //   </Button>
-    //   <Button
-    //     variant={"mint"}
-    //     size={"lg"}
-    //     onClick={getStats}
-    //     className="bg-red-300"
-    //   >
-    //     MINT
-    //   </Button>
-    // </div>
     <>
       {/* INFO Section */}
       <div className="w-full md:w-80 flex-shrink-0 space-y-2 sm:space-y-4 overflow-y-auto max-h-[60vh] md:max-h-[80vh]">
