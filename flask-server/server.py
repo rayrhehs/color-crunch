@@ -7,18 +7,13 @@ from scripts.random_image_generator import random_generator
 from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, median_swap, reconstruct_image
 from utils.helpers import open_image
 from utils.colors import palettes
-from supabase import create_client
 import io
-import os
 import uuid
 import base64
 
-url = os.environ.get("SUPABASE_URL")
-key = os.environ.get("SUPABASE_KEY")
-supabase = create_client(url, key)
-
 app = Flask(__name__)   
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # enable CORS for all routes so I don't see an error when sending requests to backend 
+MAX_FILE_SIZE = 15 * 1024 * 1024
 
 @app.route("/generate", methods=['POST'])
 def generate_new_image():
@@ -41,15 +36,25 @@ def generate_new_image():
 @app.route("/generate-modified", methods=['POST'])
 def generate_modified_image():
     
-    if "file" not in request.files:
-        return jsonify({"success": False, "error": "No file uplaoded"}), 400
-    uploaded_file = request.files["image"]
+    if "image" not in request.files:
+        return jsonify({"success": False, "error": "No file uploaded"}), 400
     
+    uploaded_file = request.files["image"]
+    user_theme = request.form["theme"]
+    user_palette_size = request.form["paletteSize"]
+
+    uploaded_file.stream.seek(0, 2) # 
+    filesize = uploaded_file.stream.tell()
+    uploaded_file.stream.seek(0)
+
+    if (filesize > MAX_FILE_SIZE):
+        return jsonify({
+            "success": False, 
+            "error": "Uploaded image exceeds maximum file size."
+        }), 400
+
     try: 
         image = open_image(uploaded_file)
-
-        user_theme = request.form["theme"]
-        user_palette_size = request.form["paletteSize"]
 
         reduced_img = reduce_image_size(image)
         pixel_array = make_pixel_array(reduced_img)
@@ -62,8 +67,7 @@ def generate_modified_image():
         image_io.seek(0)
 
         image_bytes = image_io.getvalue()
-        filesize = len(image_io)
-
+        imagesize = len(image_bytes)
         filename = f"modified_image_{uuid.uuid4()}.jpeg"
 
         image_io.seek(0)
@@ -74,11 +78,13 @@ def generate_modified_image():
             "success": True,
             "mime": "image/jpeg",
             "filename": filename,
-            "filesize": filesize,
+            "imagesize": imagesize,
             "width": image.width,
             "height": image.height,
             "data": image_base64
         }
+
+        return jsonify(response), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
