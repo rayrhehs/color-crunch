@@ -11,6 +11,7 @@ from supabase import create_client
 import io
 import os
 import uuid
+import base64
 
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
@@ -39,43 +40,48 @@ def generate_new_image():
 
 @app.route("/generate-modified", methods=['POST'])
 def generate_modified_image():
+    
+    if "file" not in request.files:
+        return jsonify({"success": False, "error": "No file uplaoded"}), 400
     uploaded_file = request.files["image"]
-    image = open_image(uploaded_file)
-
-    user_theme = request.form["theme"]
-    user_palette_size = request.form["paletteSize"]
-
-    reduced_img = reduce_image_size(image)
-    pixel_array = make_pixel_array(reduced_img)
-    new_palette = median_cut(pixel_array, int(user_palette_size))
-    swapped_palette = median_swap(new_palette, palettes[user_theme])
-    reconstructed_image = reconstruct_image(reduced_img, pixel_array, swapped_palette)
     
-    # sending image to db and user
-    image_io = io.BytesIO()
-    reconstructed_image.save(image_io, format="JPEG")
-    image_io.seek(0)
+    try: 
+        image = open_image(uploaded_file)
 
-    image_bytes = image_io.getvalue()
+        user_theme = request.form["theme"]
+        user_palette_size = request.form["paletteSize"]
 
-    filename = f"modified_image_{uuid.uuid4()}.jpeg"
+        reduced_img = reduce_image_size(image)
+        pixel_array = make_pixel_array(reduced_img)
+        new_palette = median_cut(pixel_array, int(user_palette_size))
+        swapped_palette = median_swap(new_palette, palettes[user_theme])
+        reconstructed_image = reconstruct_image(reduced_img, pixel_array, swapped_palette)
+        
+        image_io = io.BytesIO()
+        reconstructed_image.save(image_io, format="JPEG")
+        image_io.seek(0)
 
-    # response = supabase.storage.from_("image-bucket").upload(
-    #     file=image_bytes,
-    #     path=filename,
-    #     file_options={"content-type": "image/jpeg"}
-    # )
-    
-    image_io.seek(0)
+        image_bytes = image_io.getvalue()
+        filesize = len(image_io)
 
-    if (response.status_code == 200):
-        return_io = io.BytesIO(image_bytes)
-        return send_file(return_io, mimetype="image/jpeg")
-    else:
-        return jsonify({
-                "success": False,
-                "error": "Failed to upload image"
-            }), 500
+        filename = f"modified_image_{uuid.uuid4()}.jpeg"
+
+        image_io.seek(0)
+
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+        response = {
+            "success": True,
+            "mime": "image/jpeg",
+            "filename": filename,
+            "filesize": filesize,
+            "width": image.width,
+            "height": image.height,
+            "data": image_base64
+        }
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 if __name__ == "__main__":
