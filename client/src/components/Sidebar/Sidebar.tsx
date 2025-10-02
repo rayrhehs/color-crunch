@@ -4,14 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import palettes from "./palettes.json";
-import { SelectedImageContext, GeneratedImageContext } from "@/App";
+import {
+  SelectedImageContext,
+  GeneratedImageContext,
+  ImagePropsContext,
+} from "@/App";
 
 function Sidebar() {
-  const imageContext = useContext(SelectedImageContext);
+  const selectedImageContext = useContext(SelectedImageContext);
   const generatedImageContext = useContext(GeneratedImageContext);
+  const imagePropsContext = useContext(ImagePropsContext);
 
-  if (!imageContext) {
-    throw new Error("ImageContext must be used within a ImageContext.Provider");
+  if (!selectedImageContext) {
+    throw new Error(
+      "ImageContext must be used within an ImageContext.Provider"
+    );
   }
 
   if (!generatedImageContext) {
@@ -20,8 +27,15 @@ function Sidebar() {
     );
   }
 
-  const { selectedImage } = imageContext;
+  if (!imagePropsContext) {
+    throw new Error(
+      "ImagePropsContext must be within an ImagePropsContext.Provider"
+    );
+  }
+
+  const { selectedImage } = selectedImageContext;
   const { setGeneratedImage } = generatedImageContext;
+  const { imageProps, setImageProps } = imagePropsContext;
 
   const paletteValues = [2, 4, 8, 12, 16];
   const [paletteIndex, setPaletteIndex] = useState<number>(2); // note: 2 is not the palette size, it is index pointing to palette size = 8
@@ -86,7 +100,9 @@ function Sidebar() {
         responseType: "json",
       })
       .then((response) => {
-        setGeneratedImage(base64ToBlob(response.data.data, response.data.mime));
+        const imageData = response.data;
+        setGeneratedImage(base64ToBlob(imageData.data, imageData.mime));
+        console.log(imageData);
       })
       .catch((error) => {
         console.error(error);
@@ -107,9 +123,9 @@ function Sidebar() {
             INFO
           </div>
           <div className="bg-white border-4 border-black text-black p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
-            <div>sourcefile.png</div>
-            <div>250 kb</div>
-            <div>2985736235 pixels</div>
+            <div>{imageProps.name}</div>
+            <div>{imageProps.size} kb</div>
+            <div>{imageProps.pixels} pixels</div>
           </div>
         </div>
 

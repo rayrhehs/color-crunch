@@ -1,12 +1,17 @@
 import { useState, useEffect, useContext } from "react";
-import { SelectedImageContext, GeneratedImageContext } from "@/App";
+import {
+  SelectedImageContext,
+  GeneratedImageContext,
+  ImagePropsContext,
+} from "@/App";
 
 function Board() {
-  const imageContext = useContext(SelectedImageContext);
+  const selectedImageContext = useContext(SelectedImageContext);
   const generatedImageContext = useContext(GeneratedImageContext);
+  const imagePropsContext = useContext(ImagePropsContext);
 
   // check to see if null -> by doing this, typescript will not complain!
-  if (!imageContext) {
+  if (!selectedImageContext) {
     throw new Error("ImageContext must be used within a ImageContext.Provider");
   }
 
@@ -16,9 +21,43 @@ function Board() {
     );
   }
 
-  const { selectedImage } = imageContext;
+  // ts was complaining that in case ImagePropsContext is undefined
+  // to fix this I check at run-time that if !context == undefined => throw error otherwise, keep moving
+  function useImagePropsContext() {
+    const context = useContext(ImagePropsContext);
+    if (!context) {
+      throw new Error(
+        "useImagePropsContext must be used within an ImagePropsContext.Provider"
+      );
+    }
+    return context;
+  }
+
+  const { selectedImage } = selectedImageContext;
   const { generatedImage } = generatedImageContext;
+  const { setImageProps } = useImagePropsContext();
   const currentImage = generatedImage ?? selectedImage ?? null;
+
+  useEffect(() => {
+    if (!currentImage) return;
+
+    const img = new Image();
+    img.onload = () => {
+      setImageProps((prev) => ({
+        ...prev,
+        size: currentImage.size,
+        type: currentImage.type,
+        height: img.naturalHeight,
+        width: img.naturalWidth,
+        pixels: img.naturalHeight * img.naturalWidth,
+      }));
+
+      // free memory
+      URL.revokeObjectURL(img.src);
+    };
+
+    img.src = URL.createObjectURL(currentImage);
+  }, [currentImage, setImageProps]);
 
   return (
     <div className="flex flex-col md:flex-row gap-2 sm:gap-4 h-full max-w-6xl max-h-full">

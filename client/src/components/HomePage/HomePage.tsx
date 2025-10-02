@@ -1,17 +1,28 @@
 import type React from "react";
 
 import { useContext } from "react";
-import { SelectedImageContext } from "@/App";
+import { SelectedImageContext, ImagePropsContext } from "@/App";
 
 function HomePage() {
-  const imageContext = useContext(SelectedImageContext);
+  const selectedImageContext = useContext(SelectedImageContext);
+  const imagePropsContext = useContext(ImagePropsContext);
 
   // check to see if null -> by doing this, typescript will not complain!
-  if (!imageContext) {
-    throw new Error("ImageContext must be used within a ImageContext.Provider");
+  if (!selectedImageContext) {
+    throw new Error(
+      "ImageContext must be used within an ImageContext.Provider"
+    );
   }
 
-  const { selectedImage, setSelectedImage } = imageContext;
+  if (!imagePropsContext) {
+    throw new Error(
+      "ImagePropsContext must be used within an ImagePropsContext.Provider"
+    );
+  }
+
+  const { selectedImage, setSelectedImage } = selectedImageContext;
+  const { setImageProps } = imagePropsContext;
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -29,13 +40,25 @@ function HomePage() {
         "image/gif",
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert("Please select a JPG, PNG, or GIF file");
+        alert("Please select a JPG, PNG, or GIF file.");
         return;
       }
 
-      setSelectedImage(file);
+      // const img = new Image();
 
-      console.log("[v0] File selected:", file.name, file.size, file.type);
+      // img.onload = () => {};
+      // img.src = URL.createObjectURL(file);
+
+      // URL.revokeObjectURL(img.src);
+
+      console.log("[File selected:", file.name, file.size, file.type);
+
+      setImageProps((prev) => ({
+        ...prev,
+        name: file.name,
+        size: file.size,
+      }));
+      setSelectedImage(file);
     }
   };
 

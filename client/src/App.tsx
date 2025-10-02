@@ -15,6 +15,23 @@ type GeneratedImageContextType = {
   setGeneratedImage: React.Dispatch<React.SetStateAction<Blob | null>>;
 };
 
+type Color = { r: number; g: number; b: number };
+
+interface ImagePropsTypes {
+  name: string;
+  height: number;
+  width: number;
+  size: number;
+  pixels: number;
+  time: number;
+  palette: Color[];
+}
+
+interface ImagePropsContextType {
+  imageProps: ImagePropsTypes;
+  setImageProps: React.Dispatch<React.SetStateAction<ImagePropsTypes>>;
+}
+
 export const SelectedImageContext = createContext<ImageContextType | null>(
   null
 );
@@ -22,28 +39,43 @@ export const SelectedImageContext = createContext<ImageContextType | null>(
 export const GeneratedImageContext =
   createContext<GeneratedImageContextType | null>(null);
 
+export const ImagePropsContext = createContext<
+  ImagePropsContextType | undefined
+>(undefined);
+
 function App() {
   const [selectedImage, setSelectedImage] = useState<Blob | null>(null);
   const [generatedImage, setGeneratedImage] = useState<Blob | null>(null);
+  const [imageProps, setImageProps] = useState<ImagePropsTypes>({
+    name: "",
+    height: 0,
+    width: 0,
+    size: 0,
+    pixels: 0,
+    time: 0,
+    palette: [],
+  });
 
   return (
     <div className="w-screen">
-      <SelectedImageContext.Provider
-        value={{ selectedImage, setSelectedImage }}
-      >
-        <GeneratedImageContext.Provider
-          value={{ generatedImage, setGeneratedImage }}
+      <ImagePropsContext.Provider value={{ imageProps, setImageProps }}>
+        <SelectedImageContext.Provider
+          value={{ selectedImage, setSelectedImage }}
         >
-          {selectedImage ? (
-            <div className="min-h-screen max-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4">
-              <Board></Board>
-              <Sidebar></Sidebar>
-            </div>
-          ) : (
-            <HomePage></HomePage>
-          )}
-        </GeneratedImageContext.Provider>
-      </SelectedImageContext.Provider>
+          <GeneratedImageContext.Provider
+            value={{ generatedImage, setGeneratedImage }}
+          >
+            {selectedImage ? (
+              <div className="min-h-screen max-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4">
+                <Board></Board>
+                <Sidebar></Sidebar>
+              </div>
+            ) : (
+              <HomePage></HomePage>
+            )}
+          </GeneratedImageContext.Provider>
+        </SelectedImageContext.Provider>
+      </ImagePropsContext.Provider>
     </div>
   );
 }
