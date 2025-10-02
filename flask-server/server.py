@@ -15,23 +15,23 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # enable CORS for all routes so I don't see an error when sending requests to backend 
 MAX_FILE_SIZE = 15 * 1024 * 1024
 
-@app.route("/generate", methods=['POST'])
-def generate_new_image():
-    # destructure image property from the request object 
-    uploaded_file = request.files["image"]
-    # open image inside of PIL so that it is accessible to library
-    image = open_image(uploaded_file)
-    # make modifications to image
-    processed_image = random_generator(image)
-    # creates an in-memory binary stream that temporarily creates an object in RAM that acts like one stored on the disk
-    image_io = io.BytesIO()
-    # save processed image
-    processed_image.save(image_io, format="PNG")
-    # reset pointer to start of the file
-    image_io.seek(0) 
+# @app.route("/generate", methods=['POST'])
+# def generate_new_image():
+#     # destructure image property from the request object 
+#     uploaded_file = request.files["image"]
+#     # open image inside of PIL so that it is accessible to library
+#     image = open_image(uploaded_file)
+#     # make modifications to image
+#     processed_image = random_generator(image)
+#     # creates an in-memory binary stream that temporarily creates an object in RAM that acts like one stored on the disk
+#     image_io = io.BytesIO()
+#     # save processed image
+#     processed_image.save(image_io, format="PNG")
+#     # reset pointer to start of the file
+#     image_io.seek(0) 
 
-    # send processed image back to frontend
-    return send_file(image_io, mimetype="image/png")
+#     # send processed image back to frontend
+#     return send_file(image_io, mimetype="image/png")
 
 @app.route("/generate-modified", methods=['POST'])
 def generate_modified_image():
@@ -81,7 +81,8 @@ def generate_modified_image():
             "imagesize": imagesize,
             "width": image.width,
             "height": image.height,
-            "data": image_base64
+            "data": image_base64,
+            "palette": swapped_palette.astype(float).tolist()
         }
 
         return jsonify(response), 200

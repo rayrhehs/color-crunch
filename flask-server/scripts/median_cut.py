@@ -121,6 +121,9 @@ def median_swap(palette, user_palette):
    reduced_palette = np.array(palette)
    target_palette = np.array(user_palette)
    
+   # building list with standard python to use .append
+   # converting swapped_palette to np.array in the beginning would NOT allow for the use of .append 
+   # # slower process = messes up logic
    swapped_palette = []
    for color in reduced_palette:
       diffs = target_palette - color
@@ -128,6 +131,8 @@ def median_swap(palette, user_palette):
       idx = np.argmin(dists)
       swapped_palette.append(target_palette[idx])
 
+   # convert back to np.array for access to data later/ease of use in other functions
+   swapped_palette = np.array(swapped_palette)
    return swapped_palette
 
 
