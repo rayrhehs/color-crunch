@@ -4,7 +4,7 @@ load_dotenv()
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from scripts.random_image_generator import random_generator
-from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, median_swap, reconstruct_image
+from scripts.median_cut import make_pixel_array, reduce_image_size, median_cut, median_swap, reconstruct_image, best_contrasting_color
 from utils.helpers import open_image
 from utils.colors import palettes
 import io
@@ -60,8 +60,12 @@ def generate_modified_image():
         pixel_array = make_pixel_array(reduced_img)
         new_palette = median_cut(pixel_array, int(user_palette_size))
         swapped_palette = median_swap(new_palette, palettes[user_theme])
-        reconstructed_image = reconstruct_image(reduced_img, pixel_array, swapped_palette)
-        
+
+        # note: most common color and contrasted color contain numpy.int64 
+        # convert them to ints before making the tuple in the final response
+        reconstructed_image, most_common_color = reconstruct_image(reduced_img, pixel_array, swapped_palette)
+        contrasted_color = best_contrasting_color(most_common_color, swapped_palette)
+
         image_io = io.BytesIO()
         reconstructed_image.save(image_io, format="JPEG")
         image_io.seek(0)
@@ -82,7 +86,9 @@ def generate_modified_image():
             "width": image.width,
             "height": image.height,
             "data": image_base64,
-            "palette": swapped_palette.astype(float).tolist()
+            "palette": swapped_palette.astype(float).tolist(),
+            "most_common_color": tuple(int(x) for x in most_common_color),
+            "contrasted_color": tuple(int(x) for x in contrasted_color),
         }
 
         return jsonify(response), 200

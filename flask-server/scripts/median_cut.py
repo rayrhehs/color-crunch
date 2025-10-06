@@ -1,12 +1,14 @@
 from PIL import Image
+from collections import Counter
 import numpy as np
+import wcag_contrast_ratio as contrast
 
 # ---------------
 # pseudo code
-# 1. get image pixel data and place it into an array -> list(image.getData()) OR use numpy array
-# 2. create function(a) -> determine the rgb value with greatest range
+# 1. get image pixel data and place it into an array 
+# 2. create function(a) to determine the rgb value with greatest range
 # 3. order array based on this rgb value
-# 4. find median and split array into two
+# 4. find median or middle and split array into two
 # 5. repeat steps 2 to 4 till desired palette made
 
 def reduce_image_size(image):
@@ -149,20 +151,54 @@ def reconstruct_data(image_data, palette):
   squared_differences = differences ** 2
   distances = np.sum(squared_differences, axis=2)
 
-  closest_indicies = np.argmin(distances, axis=1)
+  closest_indices = np.argmin(distances, axis=1)
 
-  reconstructed_data = palette_array[closest_indicies]
+  reconstructed_data = palette_array[closest_indices]
 
-  return reconstructed_data
+  return reconstructed_data, closest_indices
 
 
 def reconstruct_image(image, image_data, palette):
    
-  reconstructed_data = reconstruct_data(image_data, palette)
+  reconstructed_data, closest_indices = reconstruct_data(image_data, palette)
 
+  # determine the most common color
+  most_common_index = Counter(closest_indices).most_common(1)[0][0]
+  most_common_color = tuple(palette[most_common_index])
+
+  # reconstruct the image
   reconstructed_uint8 = reconstructed_data.astype(np.uint8)
   width, height = image.size
   reconstructed_array = reconstructed_uint8.reshape(height, width, 3)
   reconstructed_image = Image.fromarray(reconstructed_array)
   
-  return reconstructed_image
+  return reconstructed_image, most_common_color
+
+
+def luminance(rgb):
+    r, g, b = rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0
+    return 0.299 * r + 0.587 * g + 0.114 * b
+
+def best_contrasting_color(target_rgb, palette):
+    
+    target_lum = luminance(target_rgb)
+    best_color = None
+    max_contrast = 0
+    
+    for color in palette:
+        if isinstance(color, np.ndarray):
+            color_tuple = tuple(color)
+        else:
+            color_tuple = color
+            
+        if color_tuple == target_rgb:
+            continue
+        
+        color_lum = luminance(color_tuple)
+        contrast = abs(target_lum - color_lum)
+        
+        if contrast > max_contrast:
+            max_contrast = contrast
+            best_color = color_tuple
+    
+    return best_color
