@@ -64,7 +64,6 @@ function Sidebar() {
     const theme = e.currentTarget.dataset.theme;
     if (theme) {
       setTheme(theme);
-      console.log(theme);
     }
   };
 
@@ -102,6 +101,13 @@ function Sidebar() {
       .then((response) => {
         const imageData = response.data;
         setGeneratedImage(base64ToBlob(imageData.data, imageData.mime));
+        setImageProps((prev) => ({
+          ...prev,
+          name: imageData.filename,
+          palette: imageData.palette,
+          commonColor: imageData.most_common_color,
+          contrastedColor: imageData.contrasted_color,
+        }));
         console.log(imageData);
       })
       .catch((error) => {
@@ -118,11 +124,11 @@ function Sidebar() {
     <>
       {/* INFO Section */}
       <div className="w-full md:w-80 flex-shrink-0 space-y-2 sm:space-y-4 overflow-y-auto max-h-[60vh] md:max-h-[80vh]">
-        <div className="bg-black text-white">
-          <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
+        <div className="bg-[var(--contrasted-color)] text-white">
+          <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
             INFO
           </div>
-          <div className="bg-white border-4 border-black text-black p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
+          <div className="bg-[var(--common-color)] border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)] p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
             <div>{imageProps.name}</div>
             <div>{imageProps.size} kb</div>
             <div>{imageProps.pixels} pixels</div>
@@ -130,17 +136,17 @@ function Sidebar() {
         </div>
 
         {/* THEMES Section */}
-        <div className="bg-black text-white">
-          <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
+        <div className="bg-[var(--contrasted-color)] text-white">
+          <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
             THEMES
           </div>
-          <div className="bg-white p-3 md:p-4 space-y-3 border-4 border-black">
+          <div className="bg-[var(--common-color)] p-3 md:p-4 space-y-3 border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)]">
             <div className="space-y-2 cursor-pointer">
               {visiblePalettes.map(([name, colors]) => (
                 <button
                   data-theme={name}
                   key={name}
-                  className="flex h-6 sm:h-8 w-full transition-all duration-200 hover:scale-[1.02] border-2 border-black cursor-pointer"
+                  className="flex h-6 sm:h-8 w-full transition-all duration-200 hover:scale-[1.02] border-3 border-[var(--contrasted-color)] cursor-pointer"
                   onClick={changeSelectedTheme}
                 >
                   {colors.map((color, colorIndex) => (
@@ -158,14 +164,14 @@ function Sidebar() {
             <div className="flex gap-2">
               <Button
                 onClick={handlePrevTheme}
-                className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8 cursor-pointer"
+                className="flex-1 rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] hover:bg-gray-800 h-6 sm:h-8 cursor-pointer"
                 size="sm"
               >
                 <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               <Button
                 onClick={handleNextTheme}
-                className="flex-1 rounded-none bg-black text-white hover:bg-gray-800 h-6 sm:h-8 cursor-pointer"
+                className="flex-1 rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] hover:bg-gray-800 h-6 sm:h-8 cursor-pointer"
                 size="sm"
               >
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -175,14 +181,14 @@ function Sidebar() {
         </div>
 
         {/* PALETTE SIZE Section */}
-        <div className="bg-black text-white">
-          <div className="bg-black text-white px-4 py-2 font-bold text-base md:text-lg">
+        <div className="bg-[var(--contrasted-color)] text-[var(--common-color)]">
+          <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
             PALETTE SIZE
           </div>
-          <div className="bg-white p-2 md:p-4 border-4 border-black">
+          <div className="bg-[var(--common-color)] p-2 md:p-4 border-4 border-[var(--contrasted-color)]">
             <div className="space-y-3 md:space-y-4">
               {/* Size labels */}
-              <div className="flex px-1 justify-between text-black font-mono text-xs sm:text-sm">
+              <div className="flex px-1 justify-between text-[var(--contrasted-color)] font-mono text-xs sm:text-sm">
                 <span>2</span>
                 <span className="pl-2.5">4</span>
                 <span className="pl-3">8</span>
@@ -207,7 +213,7 @@ function Sidebar() {
 
         {/* GENERATE Button */}
         <Button
-          className="w-full rounded-none bg-black text-white hover:bg-gray-800 h-12 sm:h-16 text-lg sm:text-xl font-bold"
+          className="w-full rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] hover:bg-gray-800 h-12 sm:h-16 text-lg sm:text-xl font-bold"
           onClick={getStats}
         >
           GENERATE

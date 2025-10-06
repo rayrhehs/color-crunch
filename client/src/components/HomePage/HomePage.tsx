@@ -44,13 +44,6 @@ function HomePage() {
         return;
       }
 
-      // const img = new Image();
-
-      // img.onload = () => {};
-      // img.src = URL.createObjectURL(file);
-
-      // URL.revokeObjectURL(img.src);
-
       console.log("[File selected:", file.name, file.size, file.type);
 
       setImageProps((prev) => ({

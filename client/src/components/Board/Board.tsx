@@ -8,7 +8,7 @@ import {
 function Board() {
   const selectedImageContext = useContext(SelectedImageContext);
   const generatedImageContext = useContext(GeneratedImageContext);
-  const imagePropsContext = useContext(ImagePropsContext);
+  // const imagePropsContext = useContext(ImagePropsContext);
 
   // check to see if null -> by doing this, typescript will not complain!
   if (!selectedImageContext) {
@@ -35,7 +35,7 @@ function Board() {
 
   const { selectedImage } = selectedImageContext;
   const { generatedImage } = generatedImageContext;
-  const { setImageProps } = useImagePropsContext();
+  const { imageProps, setImageProps } = useImagePropsContext();
   const currentImage = generatedImage ?? selectedImage ?? null;
 
   useEffect(() => {
@@ -45,10 +45,9 @@ function Board() {
     img.onload = () => {
       setImageProps((prev) => ({
         ...prev,
-        size: currentImage.size,
-        type: currentImage.type,
         height: img.naturalHeight,
         width: img.naturalWidth,
+        size: currentImage.size,
         pixels: img.naturalHeight * img.naturalWidth,
       }));
 
@@ -62,7 +61,14 @@ function Board() {
   return (
     <div className="flex flex-col md:flex-row gap-2 sm:gap-4 h-full max-w-6xl max-h-full">
       <div className="w-full md:flex-1 flex-shrink-0">
-        <div className="border-4 border-black bg-white p-2 h-full flex -center">
+        <div
+          className="border-4 border-black bg-white h-full flex -center"
+          style={{
+            borderColor: imageProps.contrastedColor
+              ? `rgb(${imageProps.contrastedColor.join(",")})`
+              : "#000000ff",
+          }}
+        >
           {currentImage && (
             <img
               src={URL.createObjectURL(currentImage)}

@@ -1,5 +1,4 @@
 import { useState, createContext } from "react";
-// import axios from "axios";
 import Board from "./components/Board/Board";
 import Sidebar from "./components/Sidebar/Sidebar";
 import HomePage from "./components/HomePage/HomePage";
@@ -25,6 +24,8 @@ interface ImagePropsTypes {
   pixels: number;
   time: number;
   palette: Color[];
+  commonColor: number[];
+  contrastedColor: number[];
 }
 
 interface ImagePropsContextType {
@@ -54,6 +55,8 @@ function App() {
     pixels: 0,
     time: 0,
     palette: [],
+    commonColor: [255, 255, 255],
+    contrastedColor: [0, 0, 0],
   });
 
   return (
@@ -66,7 +69,19 @@ function App() {
             value={{ generatedImage, setGeneratedImage }}
           >
             {selectedImage ? (
-              <div className="min-h-screen max-h-screen bg-gray-100 flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4">
+              <div
+                className="min-h-screen max-h-screen bg-[var(--common-color)] flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden gap-4 transition-colors duration-250 ease-in-out"
+                style={
+                  {
+                    "--common-color": `rgb(${imageProps.commonColor.join(
+                      ","
+                    )})`,
+                    "--contrasted-color": `rgb(${imageProps.contrastedColor.join(
+                      ","
+                    )})`,
+                  } as React.CSSProperties
+                }
+              >
                 <Board></Board>
                 <Sidebar></Sidebar>
               </div>
