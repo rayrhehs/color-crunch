@@ -159,7 +159,9 @@ function Sidebar() {
           INFO
         </div>
         <div className="bg-[var(--common-color)] border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)] p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
-          <div>{imageProps.name}</div>
+          <div className="wrap-anywhere">
+            <p className="overflow-hidden">{imageProps.name}</p>
+          </div>
           <div>{imageProps.size} kb</div>
           <div>
             <p> {imageProps.pixels} pixels</p>

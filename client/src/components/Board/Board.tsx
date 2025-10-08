@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { Button } from "@/components/ui/button";
 import {
   SelectedImageContext,
   GeneratedImageContext,
@@ -33,8 +34,8 @@ function Board() {
     return context;
   }
 
-  const { selectedImage } = selectedImageContext;
-  const { generatedImage } = generatedImageContext;
+  const { selectedImage, setSelectedImage } = selectedImageContext;
+  const { generatedImage, setGeneratedImage } = generatedImageContext;
   const { imageProps, setImageProps } = useImagePropsContext();
   const currentImage = generatedImage ?? selectedImage ?? null;
 
@@ -58,21 +59,36 @@ function Board() {
     img.src = URL.createObjectURL(currentImage);
   }, [currentImage, setImageProps]);
 
+  const returnToHomePage = () => {
+    setSelectedImage(null);
+    setGeneratedImage(null);
+  };
+
   return (
-    <div className="flex items-center justify-center">
-      {currentImage && (
-        <img
-          src={URL.createObjectURL(currentImage)}
-          alt="Image Placeholder"
-          className="h-[600px] w-full object-contain border-4 border-black bg-white"
-          style={{
-            borderColor: imageProps.contrastedColor
-              ? `rgb(${imageProps.contrastedColor.join(",")})`
-              : "#000000ff",
-          }}
-        />
-      )}
-    </div>
+    <>
+      <div className="flex flex-col justify-center">
+        <Button
+          className="rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] cursor-pointer border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-12 sm:h-16 text-lg sm:text-xl font-bold"
+          onClick={returnToHomePage}
+        >
+          BACK
+        </Button>
+      </div>
+      <div className="flex items-center justify-center">
+        {currentImage && (
+          <img
+            src={URL.createObjectURL(currentImage)}
+            alt="Image Placeholder"
+            className="h-[600px] w-full object-contain border-4 border-black bg-white"
+            style={{
+              borderColor: imageProps.contrastedColor
+                ? `rgb(${imageProps.contrastedColor.join(",")})`
+                : "#000000ff",
+            }}
+          />
+        )}
+      </div>
+    </>
   );
 }
 
