@@ -101,12 +101,10 @@ function Sidebar() {
 
   useEffect(() => {
     if (generatedImage !== undefined && startTimeRef.current !== null) {
-      // Stop the timer
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
       }
 
-      // Record final elapsed time
       const total = performance.now() - startTimeRef.current;
       setElapsedTime(total);
 
@@ -155,107 +153,100 @@ function Sidebar() {
   };
 
   return (
-    <>
-      <div className="w-80 flex flex-col gap-4">
-        <div className="bg-[var(--contrasted-color)] text-white">
-          <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
-            INFO
-          </div>
-          <div className="bg-[var(--common-color)] border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)] p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
-            <div>{imageProps.name}</div>
-            <div>{imageProps.size} kb</div>
-            <div>
-              <p> {imageProps.pixels} pixels</p>
-            </div>
-            <div>GENERATED IN {(elapsedTime / 1000).toFixed(2)} SECONDS</div>
-          </div>
+    <div className="w-80 flex flex-col gap-4">
+      <div className="bg-[var(--contrasted-color)] text-white">
+        <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
+          INFO
         </div>
-
-        <div className="bg-[var(--contrasted-color)] text-white">
-          <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
-            THEMES
+        <div className="bg-[var(--common-color)] border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)] p-3 md:p-4 space-y-1 text-xs sm:text-sm font-mono">
+          <div>{imageProps.name}</div>
+          <div>{imageProps.size} kb</div>
+          <div>
+            <p> {imageProps.pixels} pixels</p>
           </div>
-          <div className="bg-[var(--common-color)] p-3 md:p-4 space-y-3 border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)]">
-            <div className="space-y-2 cursor-pointer">
-              {visiblePalettes.map(([name, colors]) => (
-                <button
-                  data-theme={name}
-                  key={name}
-                  className="flex h-6 sm:h-8 w-full transition-all duration-200 hover:scale-[1.02] border-3 border-[var(--contrasted-color)] cursor-pointer"
-                  onClick={changeSelectedTheme}
-                >
-                  {colors.map((color, colorIndex) => (
-                    <div
-                      key={colorIndex}
-                      className="flex-1"
-                      style={{ backgroundColor: `rgb(${color.join(", ")})` }}
-                    />
-                  ))}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                onClick={handlePrevTheme}
-                className="flex-1 rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-6 sm:h-8 cursor-pointer"
-                size="sm"
-              >
-                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
-              <Button
-                onClick={handleNextTheme}
-                className="flex-1 rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-6 sm:h-8 cursor-pointer"
-                size="sm"
-              >
-                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
-            </div>
-          </div>
+          <div>GENERATED IN {(elapsedTime / 1000).toFixed(2)} SECONDS</div>
         </div>
-
-        <div className="bg-[var(--contrasted-color)] text-[var(--common-color)]">
-          <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
-            PALETTE SIZE
-          </div>
-          <div className="bg-[var(--common-color)] p-2 md:p-4 border-4 border-[var(--contrasted-color)]">
-            <div className="space-y-3 md:space-y-4">
-              <div className="flex px-1 justify-between text-[var(--contrasted-color)] font-mono text-xs sm:text-sm">
-                <span>2</span>
-                <span className="pl-2.5">4</span>
-                <span className="pl-3">8</span>
-                <span className="pl-2">12</span>
-                <span>16</span>
-              </div>
-
-              <div>
-                <Slider
-                  value={[paletteIndex]} // this has to be turned into an array because that is the way sliders work
-                  onValueChange={(index) => setPaletteIndex(index[0])}
-                  max={4}
-                  min={0}
-                  step={1}
-                  className="w-full"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Button
-          className="w-full rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] cursor-pointer border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-12 sm:h-16 text-lg sm:text-xl font-bold"
-          onClick={getStats}
-          disabled={isGenerating}
-        >
-          {isGenerating ? "GENERATING" : "GENERATE"}
-        </Button>
-        {/* <p className="text-[var(--contrasted-color)]">
-          {isGenerating
-            ? `GENERATED IN ${(elapsedTime / 1000).toFixed(2)} SECONDS`
-            : null}
-        </p> */}
       </div>
-    </>
+
+      <div className="bg-[var(--contrasted-color)] text-white">
+        <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
+          THEMES
+        </div>
+        <div className="bg-[var(--common-color)] p-3 md:p-4 space-y-3 border-4 border-[var(--contrasted-color)] text-[var(--contrasted-color)]">
+          <div className="space-y-2 cursor-pointer">
+            {visiblePalettes.map(([name, colors]) => (
+              <button
+                data-theme={name}
+                key={name}
+                className="flex h-6 sm:h-8 w-full transition-all duration-200 hover:scale-[1.02] border-3 border-[var(--contrasted-color)] cursor-pointer"
+                onClick={changeSelectedTheme}
+              >
+                {colors.map((color, colorIndex) => (
+                  <div
+                    key={colorIndex}
+                    className="flex-1"
+                    style={{ backgroundColor: `rgb(${color.join(", ")})` }}
+                  />
+                ))}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={handlePrevTheme}
+              className="flex-1 rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-6 sm:h-8 cursor-pointer"
+              size="sm"
+            >
+              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              onClick={handleNextTheme}
+              className="flex-1 rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-6 sm:h-8 cursor-pointer"
+              size="sm"
+            >
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-[var(--contrasted-color)] text-[var(--common-color)]">
+        <div className="bg-[var(--contrasted-color)] text-[var(--common-color)] px-4 py-2 font-bold text-base md:text-lg">
+          PALETTE SIZE
+        </div>
+        <div className="bg-[var(--common-color)] p-2 md:p-4 border-4 border-[var(--contrasted-color)]">
+          <div className="space-y-3 md:space-y-4">
+            <div className="flex px-1 justify-between text-[var(--contrasted-color)] font-mono text-xs sm:text-sm">
+              <span>2</span>
+              <span className="pl-2.5">4</span>
+              <span className="pl-3">8</span>
+              <span className="pl-2">12</span>
+              <span>16</span>
+            </div>
+
+            <div>
+              <Slider
+                value={[paletteIndex]} // this has to be turned into an array because that is the way sliders work
+                onValueChange={(index) => setPaletteIndex(index[0])}
+                max={4}
+                min={0}
+                step={1}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Button
+        className="w-full rounded-none bg-[var(--contrasted-color)] text-[var(--common-color)] cursor-pointer border-4 border-transparent hover:border-4 hover:text-[var(--contrasted-color)] hover:border-[var(--contrasted-color)] h-12 sm:h-16 text-lg sm:text-xl font-bold"
+        onClick={getStats}
+        disabled={isGenerating}
+      >
+        {isGenerating ? "GENERATING" : "GENERATE"}
+      </Button>
+    </div>
   );
 }
 
