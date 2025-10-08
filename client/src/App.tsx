@@ -82,8 +82,10 @@ function App() {
                   } as React.CSSProperties
                 }
               >
-                <Board></Board>
-                <Sidebar></Sidebar>
+                <div className="flex justify-center gap-4 w-full max-h-[80vh]">
+                  <Board></Board>
+                  <Sidebar></Sidebar>
+                </div>
               </div>
             ) : (
               <HomePage></HomePage>

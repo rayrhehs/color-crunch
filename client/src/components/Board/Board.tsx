@@ -59,25 +59,19 @@ function Board() {
   }, [currentImage, setImageProps]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-2 sm:gap-4 h-full max-w-6xl max-h-full">
-      <div className="w-full md:flex-1 flex-shrink-0">
-        <div
-          className="border-4 border-black bg-white h-full flex -center"
+    <div className="flex items-center justify-center">
+      {currentImage && (
+        <img
+          src={URL.createObjectURL(currentImage)}
+          alt="Image Placeholder"
+          className="h-[600px] w-full object-contain border-4 border-black bg-white"
           style={{
             borderColor: imageProps.contrastedColor
               ? `rgb(${imageProps.contrastedColor.join(",")})`
               : "#000000ff",
           }}
-        >
-          {currentImage && (
-            <img
-              src={URL.createObjectURL(currentImage)}
-              alt="Portrait placeholder"
-              className="w-full h-[40vh] sm:h-[50vh] md:h-[70vh] max-h-[600px] object-contain"
-            />
-          )}
-        </div>
-      </div>
+        />
+      )}
     </div>
   );
 }
